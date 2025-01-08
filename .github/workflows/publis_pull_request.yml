@@ -22,7 +22,7 @@ jobs:
       - name: Setup Expo
         uses: expo/expo-github-action@v6
         with:
-          expo-version: 4.x
+          expo-version: 6.x
           expo-cache: true
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
