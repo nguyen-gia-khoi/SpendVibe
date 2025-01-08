@@ -1,0 +1,44 @@
+name: Publish Pull Request
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v6
+        with:
+          expo-version: 4.x
+          expo-cache: true
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Publish to Expo Go
+        run: NODE_ENV=dev expo publish --non-interactive --release-channel pr-${{ github.event.number }}
+
+      - name: Add Expo Link to PR
+        uses: mshick/add-pr-comment@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          message: |
+            ## Test this PR with Expo Go
+            ![Expo QR](https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=exp://exp.host/@nguyen-gia-khoi/spendvibe?release-channel=pr-${{ github.event.number }})
+            **------ Build published to [Expo](https://exp.host/@nguyen-gia-khoi/spendvibe?release-channel=pr-${{ github.event.number }}) ------**
