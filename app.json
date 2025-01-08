@@ -45,6 +45,12 @@
         "projectId": "d6fd7500-5d09-4d57-8a64-eb95eda095c1"
       }
     },
-    "owner": "nguyen-gia-khoi"
+    "owner": "nguyen-gia-khoi",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d6fd7500-5d09-4d57-8a64-eb95eda095c1"
+    }
   }
 }

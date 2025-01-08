@@ -17,21 +17,25 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 18.x
+          node-version: 16.x
 
-      - name: Setup Expo
-        uses: expo/expo-github-action@v6
-        with:
-          expo-version: 6.x
-          expo-cache: true
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+      # - name: Setup Expo
+      #   uses: expo/expo-github-action@v6
+      #   with:
+      #     expo-version: 6.x
+      #     expo-cache: true
+      #     eas-version: latest
+      #     token: ${{ secrets.EXPO_TOKEN }}
+      - name: Install Expo CLI
+        run: npm install expo
 
       - name: Install Dependencies
         run: yarn
 
+      # - name: Publish to Expo Go
+      #   run: NODE_ENV=dev expo publish --non-interactive --release-channel pr-${{ github.event.number }}
       - name: Publish to Expo Go
-        run: NODE_ENV=dev expo publish --non-interactive --release-channel pr-${{ github.event.number }}
+        run: NODE_ENV=dev npx expo publish --non-interactive --release-channel pr-${{ github.event.number }}
 
       - name: Add Expo Link to PR
         uses: mshick/add-pr-comment@v1
