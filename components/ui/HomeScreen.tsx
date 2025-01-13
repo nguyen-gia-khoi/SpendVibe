@@ -22,8 +22,8 @@ const ThuChi = [
 
       {/* Bieu do  */}
       <View style = {{flexDirection: 'row'}}>
-        <Button title='Thu'/>
-        <Button title='Chi'/>
+        <Button title='Thu nhập '/>
+        <Button title='Chi tiêu'/>
       </View>
       <View>
        <Text style = {{borderWidth: 5,
