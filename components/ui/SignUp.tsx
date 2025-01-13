@@ -56,18 +56,18 @@ export default function SignUp() {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: 'rgba(251, 114, 3, 0.88)',
+    backgroundColor: 'rgb(196, 217, 255)',
     textAlign: "center",
     paddingHorizontal: 20,
     fontSize: 40,
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(12, 11, 8, 0.92)',
+    backgroundColor: 'rgb(251, 251, 251)',
   },
   input: {
     borderBottomWidth: 2,
-    borderBottomColor: 'orange',
+    borderBottomColor: 'rgb(196, 217, 255)',
     paddingHorizontal: 5,
     marginHorizontal: 15,
     marginBottom: 30,
@@ -81,20 +81,20 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 16,
-    color: "white",
+    color: "rgb(197, 186, 255)",
     textDecorationLine: "underline",
     textAlign: "center",
   },
   text3: {
     fontSize: 16,
-    color: "white",
+    color: "rgb(197, 186, 255)",
     textAlign: "center",
   },
   viewToLogin: {
     marginTop: 20,
   },
   button: {
-    backgroundColor: "orange",
+    backgroundColor: "rgb(197, 186, 255)",
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 25,
