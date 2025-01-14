@@ -17,7 +17,7 @@ const ThuChi = [
       {/* Header */}
       <View style={styles.header}>
         <Button title="Back to Login" onPress={() => {}} />
-        <Text style={styles.username}>Nha Nhoi</Text>
+        <Text style={styles.username}>Nha nhoi</Text>
       </View>
 
       {/* Bieu do  */}

@@ -1,4 +1,4 @@
-import { router, useRouter } from "expo-router";
+import { Link, router, useRouter } from "expo-router";
 import React from "react";
 import { View, Text ,StyleSheet,TouchableOpacity, TextInput, Pressable, Button } from "react-native";
 
@@ -30,7 +30,9 @@ const Login = () => {
           <View style = {styles.viewToSignup}>
           <Text style={styles.text3}>Don't have an account? </Text>
           <Pressable>
-            <Text style={styles.linkText}>Sign up now</Text>
+          <Link href={"/(tabs)"}>
+          <Text>Don't have an account? Sign Up</Text>
+        </Link>
           </Pressable>
           </View>
     
