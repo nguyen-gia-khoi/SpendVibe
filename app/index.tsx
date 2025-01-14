@@ -2,6 +2,7 @@ import { View, Text ,StyleSheet,TouchableOpacity, TextInput, Pressable, Button }
 import HomeScreen from "@/app/(tabs)/HomeScreen";
 
 
+
 export default function App() {
   return <HomeScreen/>;
 }
