@@ -17,13 +17,13 @@ const ThuChi = [
       {/* Header */}
       <View style={styles.header}>
         <Button title="Back to Login" onPress={() => {}} />
-        <Text style={styles.username}>Nha Nhoi</Text>
+        <Text style={styles.username}>Nha nhoi</Text>
       </View>
 
       {/* Bieu do  */}
       <View style = {{flexDirection: 'row'}}>
-        <Button title='Thu'/>
-        <Button title='Chi'/>
+        <Button title='Thu nhập '/>
+        <Button title='Chi tiêu'/>
       </View>
       <View>
        <Text style = {{borderWidth: 5,

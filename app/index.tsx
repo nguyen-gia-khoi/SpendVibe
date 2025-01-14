@@ -1,9 +1,8 @@
 
 
 
-
 import { View, Text ,StyleSheet,TouchableOpacity, TextInput, Pressable, Button } from "react-native";
-import HomeScreen from "@/components/ui/HomeScreen";
+import HomeScreen from "@/app/(tabs)/HomeScreen";
 
 
 
