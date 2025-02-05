@@ -6,8 +6,11 @@ export default function Layout() {
     <Tabs>
       <Tabs.Screen
         name="HomeScreen"
-        options={{ title: "Home" }}
+        options={{
+          title: "Home",
+          tabBarStyle: { display: "none" }}}
       />
+      <Tabs.Screen name="TransactionInputScreen" options={{ title: "Add Transaction" }} />
       <Tabs.Screen
         name="Login"
         options={{ title: "Login" }}

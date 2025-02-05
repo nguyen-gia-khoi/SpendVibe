@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import React from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Pressable } from "react-native";
 
@@ -12,21 +13,21 @@ export default function SignUp() {
       <TextInput
         style={styles.input}
         placeholder="Enter your full name"
-        placeholderTextColor={"grey"}
+        placeholderTextColor={"#555"}
       />
 
       <Text style={styles.text}>Email</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your email"
-        placeholderTextColor={"grey"}
+        placeholderTextColor={"#555"}
       />
 
       <Text style={styles.text}>Phone Number</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your phone number"
-        placeholderTextColor={"grey"}
+        placeholderTextColor={"#555"}
         keyboardType="numeric"
       />
 
@@ -34,7 +35,7 @@ export default function SignUp() {
       <TextInput
         style={styles.input}
         placeholder="Enter your password"
-        placeholderTextColor={"grey"}
+        placeholderTextColor={"#555"}
         secureTextEntry
       />
 
@@ -48,6 +49,7 @@ export default function SignUp() {
         <Text style={styles.text3}>Already have an account? </Text>
         <Pressable>
           <Text style={styles.linkText}>Login</Text>
+          <Link href="/screens/login"/>
         </Pressable>
       </View>
     </View>
@@ -56,55 +58,58 @@ export default function SignUp() {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: 'rgb(196, 217, 255)',
+    backgroundColor: '#A7C7E7',
     textAlign: "center",
-    paddingHorizontal: 20,
-    fontSize: 40,
+    paddingVertical: 20,
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#2C3E50",
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgb(251, 251, 251)',
+    backgroundColor: '#F0F4F8',
+    padding: 20,
   },
   input: {
     borderBottomWidth: 2,
-    borderBottomColor: 'rgb(196, 217, 255)',
-    paddingHorizontal: 5,
-    marginHorizontal: 15,
-    marginBottom: 30,
-    color: "white",
+    borderBottomColor: '#A7C7E7',
+    paddingVertical: 10,
+    marginBottom: 20,
+    fontSize: 16,
+    color: "#333",
   },
   text: {
-    marginTop: 30,
-    paddingHorizontal: 20,
-    color: "white",
+    marginBottom: 5,
     fontSize: 16,
+    color: "#34495E",
+    fontWeight: "600",
   },
   linkText: {
     fontSize: 16,
-    color: "rgb(197, 186, 255)",
+    color: "#5D9CEC",
     textDecorationLine: "underline",
     textAlign: "center",
   },
   text3: {
     fontSize: 16,
-    color: "rgb(197, 186, 255)",
+    color: "#34495E",
     textAlign: "center",
   },
   viewToLogin: {
     marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "center",
   },
   button: {
-    backgroundColor: "rgb(197, 186, 255)",
+    backgroundColor: "#5D9CEC",
     paddingVertical: 15,
-    paddingHorizontal: 30,
     borderRadius: 25,
     alignItems: "center",
-    marginHorizontal: 20,
+    marginTop: 20,
   },
   buttonText: {
-    color: "black",
+    color: "#FFF",
     fontSize: 18,
     fontWeight: "bold",
   },
 });
-

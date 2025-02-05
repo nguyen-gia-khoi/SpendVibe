@@ -2,13 +2,13 @@
 
 
 import { View, Text ,StyleSheet,TouchableOpacity, TextInput, Pressable, Button } from "react-native";
-import HomeScreen from "@/app/(tabs)/HomeScreen";
+import Login from "./screens/login";
 
 
 
 export default function App() {
 
-  return <HomeScreen/>;
+  return <Login/>;
 }
 
 
