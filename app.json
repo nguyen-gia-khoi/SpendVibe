@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nguyengiakhoi.spendvibe"
     },
     "android": {
       "adaptiveIcon": {
@@ -46,9 +47,7 @@
       }
     },
     "owner": "nguyen-gia-khoi",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/d6fd7500-5d09-4d57-8a64-eb95eda095c1"
     }
