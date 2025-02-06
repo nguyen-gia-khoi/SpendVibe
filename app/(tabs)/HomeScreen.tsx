@@ -9,9 +9,12 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
+import { FIREBASE_AUTH } from '@/FirebaseConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { signOut } from 'firebase/auth';
 
 interface TransactionData {
   id: string; 
@@ -65,7 +68,18 @@ const [ThuChi, setThuChi] = useState<TransactionData[]>([
   function randomInterger(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+const logout = async () => {
+  try {
+      await signOut(FIREBASE_AUTH); // Firebase sign out
+      await AsyncStorage.clear(); // Clear AsyncStorage
+      console.log("User logged out and data erased");
 
+      // Redirect to login screen
+      router.replace("/screens/login");
+  } catch (error) {
+      console.error("Logout Error:", error);
+  }
+};
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -157,7 +171,7 @@ const [ThuChi, setThuChi] = useState<TransactionData[]>([
         </TouchableOpacity>
         </View>
         <View style = {{justifyContent:'center', alignItems:'center'}}>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => logout()}>
         <AntDesign name="user" size={24} color="rgb(57, 30, 191)" />
         </TouchableOpacity>
         </View>
