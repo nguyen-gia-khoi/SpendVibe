@@ -1,41 +1,59 @@
 import { Link, useRouter } from "expo-router";
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Pressable, Image } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Pressable, Image, ActivityIndicator } from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
-
+import auth from '@react-native-firebase/auth';
+import {FirebaseAuthTypes } from "@react-native-firebase/auth";
 const Login = () => {
     const router = useRouter();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false)
+
+    const signIn = async () => {
+        setLoading(true);
+        try {
+            await auth().signInWithEmailAndPassword(email, password);
+            router.replace("/(tabs)/HomeScreen")
+        } catch (error: FirebaseAuthTypes.NativeFirebaseAuthError | any) {
+            alert('Login failed: ' + error.message);
+        } 
+        finally 
+        {
+            setLoading(false);
+        }
+    }
+
     return (
         <View style={styles.container}>
+            {/* Header */}
             <Text style={styles.header}>SpendVibe</Text>
-            
+
             {/* Form */}
             <Text style={styles.label}>Email or Phone Number</Text>
-            <TextInput style={styles.input} placeholder="Enter email or phone number" placeholderTextColor={"grey"} />
-            
+            <TextInput style={styles.input} placeholder="Enter email or phone number" placeholderTextColor={"grey"} 
+                onChangeText={(text) => setEmail(text)} />
+
             <Text style={styles.label}>Password</Text>
-            <TextInput style={styles.input} placeholder="Enter password" placeholderTextColor={"grey"} secureTextEntry />
-            
+            <TextInput style={styles.input} placeholder="Enter password" placeholderTextColor={"grey"} secureTextEntry 
+                onChangeText={(text) => setPassword(text)} />
+
             {/* Button Login */}
-            <TouchableOpacity style={styles.button} onPressIn={() => {}}>
-                <Link href="/(tabs)/HomeScreen">
-                    <Text style={styles.buttonText}>Login</Text>
-                </Link>
+            <TouchableOpacity style={styles.button} onPress={signIn}>
+                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Login</Text>}
             </TouchableOpacity>
-            
+
             {/* Google Login Button */}
             <TouchableOpacity style={styles.googleButton} onPress={() => alert("Login with Google")}>  
-            <AntDesign name="google" size={24} color="black" />
+                <AntDesign name="google" size={24} color="black" />
                 <Text style={styles.googleButtonText}>Login with Google</Text>  
             </TouchableOpacity>
-            
+
             {/* Link to Sign Up */}
             <View style={styles.viewToSignup}>
                 <Text style={styles.text}>Don't have an account? </Text>
-                <Pressable>
-                    <Link href="/screens/signup">
-                        <Text style={styles.linkText}>Sign Up</Text>
-                    </Link>
+                <Pressable onPress={() => router.push("/screens/signup")}>
+                    <Text style={styles.linkText}>Sign Up</Text>
                 </Pressable>
             </View>
         </View>
