@@ -26,7 +26,9 @@ const Login = () => {
     return (
         <View className="flex-1 bg-gray-100 p-5 justify-center">
             {/* Header */}
+
             <Text className="text-6xl font-bold text-blue-500 text-center mb-9">SpendVibe</Text>
+
 
             {/* Form */}
             <Text className="text-lg text-blue-500 mb-2">Email or Phone Number</Text>
