@@ -26,7 +26,9 @@ const Login = () => {
     return (
         <View className="flex-1 bg-gray-100 p-5 justify-center">
             {/* Header */}
-            <Text className="text-6xl font-bold text-blue-500 text-center mb-10">SpendVibe</Text>
+
+            <Text className="text-6xl font-bold text-blue-500 text-center mb-9">SpendVibe</Text>
+
 
             {/* Form */}
             <Text className="text-lg text-blue-500 mb-2">Email or Phone Number</Text>
@@ -43,7 +45,7 @@ const Login = () => {
                 onChangeText={setPassword} />
 
             {/* Button Login */}
-            <TouchableOpacity className="bg-blue-500 py-4 rounded-full items-center my-5" onPress={signIn}>
+            <TouchableOpacity className="bg-blue-500 py-4 rounded-full items-center my-5 mt-7" onPress={signIn}>
                 {loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white text-lg font-bold">Login</Text>}
             </TouchableOpacity>
 
