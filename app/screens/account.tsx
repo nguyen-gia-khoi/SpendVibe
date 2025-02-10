@@ -8,7 +8,8 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Navbar from "./navbar";
+
 
 
 
@@ -68,20 +69,7 @@ const router = useRouter();
         </TouchableOpacity>
       </View>
 
-        <View className="flex-row justify-around p-4 border-t border-blue-600 items-center ">
-        <TouchableOpacity>
-          <MaterialIcons name="home" size={30} color="rgb(57, 30, 191)" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Feather name="edit" size={24} color="rgb(57, 30, 191)" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons name="notifications-outline" size={24} color="rgb(57, 30, 191)" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {}}>
-          <AntDesign name="user" size={24} color="rgb(57, 30, 191)" />
-        </TouchableOpacity>
-      </View>
+        <Navbar/>
     </View>
   )
 }

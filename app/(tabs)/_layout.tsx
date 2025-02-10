@@ -1,5 +1,6 @@
 // app/tabs/_layout.tsx
 import { Tabs } from "expo-router";
+import { useFonts } from "expo-font";
 import "../../global.css";
 
 export default function Layout() {
