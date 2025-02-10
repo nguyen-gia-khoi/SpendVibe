@@ -10,7 +10,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, router } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
-import auth from '@react-native-firebase/auth';
+
 
 interface TransactionData {
   id: string; 
@@ -42,15 +42,7 @@ const HomeScreen = () => {
     navigation.setOptions({ headerShown: false, footerShown: false });
   }, [navigation]);
 
-  const logout = async () => {
-    try {
-      await auth().signOut();
-      console.log("User logged out and data erased");
-      router.replace("/screens/login");
-    } catch (error) {
-      console.error("Logout Error:", error);
-    }
-  };
+  
 
   return (
     <View className="flex-1 bg-blue-100">
@@ -120,7 +112,7 @@ const HomeScreen = () => {
         <TouchableOpacity>
           <Ionicons name="notifications-outline" size={24} color="rgb(57, 30, 191)" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={logout}>
+        <TouchableOpacity onPress={() => router.push("/screens/account")}>
           <AntDesign name="user" size={24} color="rgb(57, 30, 191)" />
         </TouchableOpacity>
       </View>
