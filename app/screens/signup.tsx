@@ -1,281 +1,6 @@
-// // import { Link, useRouter } from "expo-router";
-// // import React, { useState } from "react";
-// // import { View, Text, StyleSheet, TextInput, TouchableOpacity, Pressable } from "react-native";
-// // import auth from '@react-native-firebase/auth';
-// // import {FirebaseAuthTypes} from "@react-native-firebase/auth";
-// // const Login = () => {
-// // export default function SignUp() {
-  
-// //   const signIn = async () => {
-// //     const router = useRouter();
-// //     const [email, setEmail] = useState("");
-// //     const [password, setPassword] = useState("");
-// //     const [loading, setLoading] = useState(false);
-// //     const [error, setError] = useState("")
-// //     const signUp = async () => {
-// //     setLoading(true);
-// //     try {
-// //         await auth().createUserWithEmailAndPassword(email, password);
-// //         alert("Logged in successfully");
-
-// //     } catch (error: FirebaseAuthTypes.NativeFirebaseAuthError | any) {
-// //       alert('Login failed: ' + error.message);
-        
-// //     }
-// //     setLoading(false);
-// // }
-// //   return (
-// //     <View style={styles.container}>
-// //     {/* Header */}
-// //     <Text style={styles.header}>SpendVibe</Text>
-
-// //     {/* Hiển thị thông báo lỗi nếu có */}
-// //     {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-// //     <Text style={styles.text}>Email</Text>
-// //     <TextInput
-// //       style={styles.input}
-// //       placeholder="Enter your email"
-// //       placeholderTextColor={"#555"}
-// //       onChangeText={(text) => setEmail(text)}
-// //     />
-
-// //     <Text style={styles.text}>Password</Text>
-// //     <TextInput
-// //       style={styles.input}
-// //       placeholder="Enter your password"
-// //       placeholderTextColor={"#555"}
-// //       secureTextEntry
-// //       onChangeText={(text) => setPassword(text)}
-// //     />
-
-// //     {/* Button Sign Up */}
-// //     <TouchableOpacity style={styles.button} onPress={signUp} disabled={loading}>
-// //       <Text style={styles.buttonText}>{loading ? "Đang đăng ký..." : "Sign Up"}</Text>
-// //     </TouchableOpacity>
-
-// //     {/* Link to Login */}
-// //     <View style={styles.viewToLogin}>
-// //       <Text style={styles.text3}>Already have an account? </Text>
-// //       <Pressable>
-// //         <Text style={styles.linkText}>Login</Text>
-// //         <Link href="/screens/login" />
-// //       </Pressable>
-// //     </View>
-// //   </View>
-// // );
-// // }
-
-// // const styles = StyleSheet.create({
-// //   header: {
-// //     backgroundColor: '#A7C7E7',
-// //     textAlign: "center",
-// //     paddingVertical: 20,
-// //     fontSize: 32,
-// //     fontWeight: "bold",
-// //     color: "#2C3E50",
-// //   },
-// //   container: {
-// //     flex: 1,
-// //     backgroundColor: '#F0F4F8',
-// //     padding: 20,
-// //   },
-// //   input: {
-// //     borderBottomWidth: 2,
-// //     borderBottomColor: '#A7C7E7',
-// //     paddingVertical: 10,
-// //     marginBottom: 20,
-// //     fontSize: 16,
-// //     color: "#333",
-// //   },
-// //   text: {
-// //     marginBottom: 5,
-// //     fontSize: 16,
-// //     color: "#34495E",
-// //     fontWeight: "600",
-// //   },
-// //   linkText: {
-// //     fontSize: 16,
-// //     color: "#5D9CEC",
-// //     textDecorationLine: "underline",
-// //     textAlign: "center",
-// //   },
-// //   text3: {
-// //     fontSize: 16,
-// //     color: "#34495E",
-// //     textAlign: "center",
-// //   },
-// //   viewToLogin: {
-// //     marginTop: 20,
-// //     flexDirection: "row",
-// //     justifyContent: "center",
-// //   },
-// //   button: {
-// //     backgroundColor: "#5D9CEC",
-// //     paddingVertical: 15,
-// //     borderRadius: 25,
-// //     alignItems: "center",
-// //     marginTop: 20,
-// //   },
-// //   buttonText: {
-// //     color: "#FFF",
-// //     fontSize: 18,
-// //     fontWeight: "bold",
-// //   },
-// // });
-// // function setLoading(arg0: boolean) {
-// //   throw new Error("Function not implemented.");
-// // }
-
-// // function auth() {
-// //   throw new Error("Function not implemented.");
-// // }
-
-// import { Link, useRouter } from "expo-router";
-// import React, { useState } from "react";
-// import { View, Text, StyleSheet, TextInput, TouchableOpacity, Pressable } from "react-native";
-// import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
-
-// export default function SignUp() {
-//   const router = useRouter();
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState("");
-
-//   const signUp = async () => {
-//     if (!email || !password) {
-//       setError("Email and password are required.");
-//       return;
-//     }
-//     setError(""); // Clear previous errors
-//     setLoading(true);
-
-//     try {
-//       await auth().createUserWithEmailAndPassword(email, password);
-//       alert("Account created successfully!");
-//       router.push("/screens/login"); // Navigate to login page after successful signup
-//     } catch (error: FirebaseAuthTypes.NativeFirebaseAuthError | any) {
-//       setError(error.message || "Something went wrong.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       {/* Header */}
-//       <Text style={styles.header}>SpendVibe</Text>
-
-//       {/* Display error message if any */}
-//       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-//       {/* Email Input */}
-//       <Text style={styles.text}>Email</Text>
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Enter your email"
-//         placeholderTextColor="#555"
-//         autoCapitalize="none"
-//         keyboardType="email-address"
-//         onChangeText={(text) => setEmail(text)}
-//         value={email}
-//       />
-
-//       {/* Password Input */}
-//       <Text style={styles.text}>Password</Text>
-//       <TextInput
-//         style={styles.input}
-//         placeholder="Enter your password"
-//         placeholderTextColor="#555"
-//         secureTextEntry
-//         onChangeText={(text) => setPassword(text)}
-//         value={password}
-//       />
-
-//       {/* Sign Up Button */}
-//       <TouchableOpacity style={styles.button} onPress={signUp} disabled={loading}>
-//         <Text style={styles.buttonText}>{loading ? "Signing up..." : "Sign Up"}</Text>
-//       </TouchableOpacity>
-
-//       {/* Link to Login */}
-//       <View style={styles.viewToLogin}>
-//         <Text style={styles.text3}>Already have an account? </Text>
-//         <Link href="/screens/login" style={styles.linkText}>
-//           Login
-//         </Link>
-//       </View>
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   header: {
-//     fontSize: 40,
-//     fontWeight: "bold",
-//     color: "#4A90E2",
-//     textAlign: "center",
-//     marginBottom: 40,
-
-//   },
-//   container: {
-//     flex: 1,
-//         backgroundColor: "#F8F9FA",
-//         padding: 20,
-//         justifyContent: "center",
-//   },
-//   input: {
-//     borderBottomWidth: 2,
-//     borderBottomColor: "#A7C7E7",
-//     paddingVertical: 10,
-//     marginBottom: 20,
-//     fontSize: 16,
-//     color: "#333",
-//   },
-//   text: {
-//     marginBottom: 5,
-//     fontSize: 16,
-//     color: "#34495E",
-//     fontWeight: "600",
-//   },
-//   linkText: {
-//     fontSize: 16,
-//     color: "#5D9CEC",
-//     textDecorationLine: "underline",
-//     textAlign: "center",
-//   },
-//   text3: {
-//     fontSize: 16,
-//     color: "#34495E",
-//     textAlign: "center",
-//   },
-//   viewToLogin: {
-//     marginTop: 20,
-//     flexDirection: "row",
-//     justifyContent: "center",
-//   },
-//   button: {
-//     backgroundColor: "#5D9CEC",
-//     paddingVertical: 15,
-//     borderRadius: 25,
-//     alignItems: "center",
-//     marginTop: 20,
-//   },
-//   buttonText: {
-//     color: "#FFF",
-//     fontSize: 18,
-//     fontWeight: "bold",
-//   },
-//   errorText: {
-//     color: "red",
-//     marginBottom: 10,
-//     fontSize: 14,
-//     textAlign: "center",
-//   },
-// });
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 export default function SignUp() {
@@ -285,7 +10,6 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Function to map Firebase error codes to user-friendly messages
   const getFirebaseErrorMessage = (errorCode: string): string => {
     switch (errorCode) {
       case "auth/email-already-in-use":
@@ -307,13 +31,13 @@ export default function SignUp() {
       return;
     }
 
-    setError(""); // Clear previous errors
+    setError("");
     setLoading(true);
 
     try {
       await auth().createUserWithEmailAndPassword(email, password);
       alert("Account created successfully!");
-      router.push("/screens/login"); // Navigate to login page
+      router.push("/screens/login");
     } catch (error: FirebaseAuthTypes.NativeFirebaseAuthError | any) {
       const friendlyMessage = getFirebaseErrorMessage(error.code);
       setError(friendlyMessage);
@@ -323,17 +47,13 @@ export default function SignUp() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <Text style={styles.header}>SpendVibe</Text>
+    <View className="flex-1 bg-gray-100 p-5 justify-center">
+      <Text className="text-4xl font-bold text-blue-500 text-center mb-10">SpendVibe</Text>
+      {error ? <Text className="text-red-500 text-center mb-2">{error}</Text> : null}
 
-      {/* Display error message if any */}
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-      {/* Email Input */}
-      <Text style={styles.text}>Email</Text>
+      <Text className="text-lg text-gray-700 font-semibold">Email</Text>
       <TextInput
-        style={styles.input}
+        className="border-b-2 border-blue-300 py-2 mb-5 text-lg text-gray-900"
         placeholder="Enter your email"
         placeholderTextColor="#555"
         autoCapitalize="none"
@@ -342,10 +62,9 @@ export default function SignUp() {
         value={email}
       />
 
-      {/* Password Input */}
-      <Text style={styles.text}>Password</Text>
+      <Text className="text-lg text-gray-700 font-semibold">Password</Text>
       <TextInput
-        style={styles.input}
+        className="border-b-2 border-blue-300 py-2 mb-5 text-lg text-gray-900"
         placeholder="Enter your password"
         placeholderTextColor="#555"
         secureTextEntry
@@ -353,81 +72,14 @@ export default function SignUp() {
         value={password}
       />
 
-      {/* Sign Up Button */}
-      <TouchableOpacity style={styles.button} onPress={signUp} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? "Signing up..." : "Sign Up"}</Text>
+      <TouchableOpacity className="bg-blue-500 py-4 rounded-full items-center mt-5" onPress={signUp} disabled={loading}>
+        <Text className="text-white text-lg font-bold">{loading ? "Signing up..." : "Sign Up"}</Text>
       </TouchableOpacity>
 
-      {/* Link to Login */}
-      <View style={styles.viewToLogin}>
-        <Text style={styles.text3}>Already have an account? </Text>
-        <Link href="/screens/login" style={styles.linkText}>
-          Login
-        </Link>
+      <View className="mt-5 flex-row justify-center">
+        <Text className="text-lg text-gray-700">Already have an account? </Text>
+        <Link href="/screens/login" className="text-lg text-blue-500 underline">Login</Link>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    fontSize: 40,
-    fontWeight: "bold",
-    color: "#4A90E2",
-    textAlign: "center",
-    marginBottom: 40,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#F0F4F8",
-    padding: 20,
-  },
-  input: {
-    borderBottomWidth: 2,
-    borderBottomColor: "#A7C7E7",
-    paddingVertical: 10,
-    marginBottom: 20,
-    fontSize: 16,
-    color: "#333",
-  },
-  text: {
-    marginBottom: 5,
-    fontSize: 16,
-    color: "#34495E",
-    fontWeight: "600",
-  },
-  linkText: {
-    fontSize: 16,
-    color: "#5D9CEC",
-    textDecorationLine: "underline",
-    textAlign: "center",
-  },
-  text3: {
-    fontSize: 16,
-    color: "#34495E",
-    textAlign: "center",
-  },
-  viewToLogin: {
-    marginTop: 20,
-    flexDirection: "row",
-    justifyContent: "center",
-  },
-  button: {
-    backgroundColor: "#5D9CEC",
-    paddingVertical: 15,
-    borderRadius: 25,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    marginBottom: 10,
-    fontSize: 14,
-    textAlign: "center",
-  },
-});

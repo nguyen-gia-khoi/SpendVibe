@@ -1,139 +1,68 @@
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Pressable, Image, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Pressable, ActivityIndicator } from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import auth from '@react-native-firebase/auth';
-import {FirebaseAuthTypes } from "@react-native-firebase/auth";
+import { FirebaseAuthTypes } from "@react-native-firebase/auth";
+
 const Login = () => {
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const signIn = async () => {
         setLoading(true);
         try {
             await auth().signInWithEmailAndPassword(email, password);
-            router.replace("/(tabs)/HomeScreen")
+            router.replace("/(tabs)/HomeScreen");
         } catch (error: FirebaseAuthTypes.NativeFirebaseAuthError | any) {
             alert('Login failed: ' + error.message);
-        } 
-        finally 
-        {
+        } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
-        <View style={styles.container}>
+        <View className="flex-1 bg-gray-100 p-5 justify-center">
             {/* Header */}
-            <Text style={styles.header}>SpendVibe</Text>
+            <Text className="text-4xl font-bold text-blue-500 text-center mb-10">SpendVibe</Text>
 
             {/* Form */}
-            <Text style={styles.label}>Email or Phone Number</Text>
-            <TextInput style={styles.input} placeholder="Enter email or phone number" placeholderTextColor={"grey"} 
-                onChangeText={(text) => setEmail(text)} />
+            <Text className="text-lg text-blue-500 mb-2">Email or Phone Number</Text>
+            <TextInput className="border-b-2 border-blue-500 p-2 mb-5 text-lg text-gray-800" 
+                placeholder="Enter email or phone number" 
+                placeholderTextColor="gray"
+                onChangeText={setEmail} />
 
-            <Text style={styles.label}>Password</Text>
-            <TextInput style={styles.input} placeholder="Enter password" placeholderTextColor={"grey"} secureTextEntry 
-                onChangeText={(text) => setPassword(text)} />
+            <Text className="text-lg text-blue-500 mb-2">Password</Text>
+            <TextInput className="border-b-2 border-blue-500 p-2 mb-5 text-lg text-gray-800" 
+                placeholder="Enter password" 
+                placeholderTextColor="gray" 
+                secureTextEntry
+                onChangeText={setPassword} />
 
             {/* Button Login */}
-            <TouchableOpacity style={styles.button} onPress={signIn}>
-                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Login</Text>}
+            <TouchableOpacity className="bg-blue-500 py-4 rounded-full items-center my-5" onPress={signIn}>
+                {loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white text-lg font-bold">Login</Text>}
             </TouchableOpacity>
 
             {/* Google Login Button */}
-            <TouchableOpacity style={styles.googleButton} onPress={() => alert("Login with Google")}>  
+            <TouchableOpacity className="flex-row bg-white border border-gray-300 py-4 rounded-full items-center justify-center my-2" 
+                onPress={() => alert("Login with Google")}>
                 <AntDesign name="google" size={24} color="black" />
-                <Text style={styles.googleButtonText}>Login with Google</Text>  
+                <Text className="text-gray-800 text-lg font-bold ml-2">Login with Google</Text>
             </TouchableOpacity>
 
             {/* Link to Sign Up */}
-            <View style={styles.viewToSignup}>
-                <Text style={styles.text}>Don't have an account? </Text>
+            <View className="flex-row justify-center mt-5">
+                <Text className="text-lg text-gray-800">Don't have an account? </Text>
                 <Pressable onPress={() => router.push("/screens/signup")}>
-                    <Text style={styles.linkText}>Sign Up</Text>
+                    <Text className="text-lg text-blue-500 underline">Sign Up</Text>
                 </Pressable>
             </View>
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#F8F9FA",
-        padding: 20,
-        justifyContent: "center",
-    },
-    header: {
-        fontSize: 40,
-        fontWeight: "bold",
-        color: "#4A90E2",
-        textAlign: "center",
-        marginBottom: 40,
-    },
-    label: {
-        fontSize: 16,
-        color: "#4A90E2",
-        marginBottom: 5,
-    },
-    input: {
-        borderBottomWidth: 2,
-        borderBottomColor: "#4A90E2",
-        padding: 10,
-        marginBottom: 20,
-        fontSize: 16,
-        color: "#333",
-    },
-    button: {
-        backgroundColor: "#4A90E2",
-        paddingVertical: 15,
-        borderRadius: 25,
-        alignItems: "center",
-        marginVertical: 20,
-    },
-    buttonText: {
-        color: "#fff",
-        fontSize: 18,
-        fontWeight: "bold",
-    },
-    googleButton: {
-        flexDirection: "row",
-        backgroundColor: "#fff",
-        borderWidth: 1,
-        borderColor: "#ddd",
-        paddingVertical: 15,
-        borderRadius: 25,
-        alignItems: "center",
-        justifyContent: "center",
-        marginVertical: 10,
-        
-    },
-    googleButtonText: {
-        color: "#333",
-        fontSize: 16,
-        fontWeight: "bold",
-        marginLeft: 10,
-    },
-    googleIcon: {
-        width: 20,
-        height: 20,
-    },
-    viewToSignup: {
-        flexDirection: "row",
-        justifyContent: "center",
-    },
-    text: {
-        fontSize: 16,
-        color: "#333",
-    },
-    linkText: {
-        fontSize: 16,
-        color: "#4A90E2",
-        textDecorationLine: "underline",
-    },
-});
 
 export default Login;
