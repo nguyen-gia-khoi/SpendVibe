@@ -11,15 +11,18 @@ export default function Layout() {
           title: "Home",
           tabBarStyle: { display: "none" }}}
       />
-      <Tabs.Screen name="TransactionInputScreen" options={{ title: "Add Transaction" }} />
+      <Tabs.Screen 
+      name="TransactionInputScreen" 
+      options={{ title: "Add Transaction" }} />
       <Tabs.Screen
         name="Login"
         options={{ title: "Login" }}
       />
       <Tabs.Screen
-        name="SignUp"
+        name="SignUp" 
         options={{ title: "Sign Up" }}
       />
+      <Tabs.Screen name="account" options={{ title: "Profile" }} />
     </Tabs>
   );
 }
