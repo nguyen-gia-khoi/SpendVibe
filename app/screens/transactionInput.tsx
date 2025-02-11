@@ -1,109 +1,172 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
+import { View, TextInput, Button, Text, Alert, Pressable, Modal, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
+import Navbar from './navbar';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Feather from '@expo/vector-icons/Feather';
 
 interface TransactionInputData {
-    type: string;
-    amount: string;
-    date: string;
+  type: string;
+  amount: string;
+  date: string;
 }
+
+const transactionCategories = {
+  income: [
+    'Lương & Thu nhập ',
+    'Thu nhập phụ',
+    'Đầu tư',
+    'Kinh doanh',
+    'Tiền thưởng & Quà tặng',
+    'Tiền hoàn trả',
+    'Khác',
+  ],
+  expense: [
+    'Chi phí sinh hoạt',
+    'Phương tiện đi lại',
+    'Mua sắm cá nhân',
+    'Giải trí & Du lịch',
+    'Giáo dục',
+    'Sức khỏe',
+    'Đầu tư & Tiết kiệm',
+    'Khác',
+  ],
+};
 
 const TransactionInputScreen = () => {
   const navigation = useNavigation();
-
   const [transactionData, setTransactionData] = useState<TransactionInputData>({
-      type: '',
-      amount: '',
-      date: '',
-  })
+    type: '',
+    amount: '',
+    date: '',
+  });
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedType, setSelectedType] = useState<'income' | 'expense' | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const handleInputChange = (name: string, value: string) => {
-      setTransactionData({
-          ...transactionData,
-          [name]: value,
-      })
-  }
+    setTransactionData({
+      ...transactionData,
+      [name]: value,
+    });
+  };
 
   const handleAddTransaction = () => {
     const { type, amount, date } = transactionData;
-  
     if (!type || !amount || !date) {
-      Alert.alert('Thông tin bị bỏ trống', 'Vui lòng nhập đầy đủ thông tin', [
-        { text: 'OK' },
-      ]);
+      Alert.alert('Thông tin bị bỏ trống', 'Vui lòng nhập đầy đủ thông tin', [{ text: 'OK' }]);
       return;
     }
-  
-    const newTransaction = {
-      id: Date.now().toString(),
-      type,
-      amount: parseFloat(amount),
-      date,
-    };
-  
-    
-    const queryString = new URLSearchParams({
-      id: newTransaction.id,
-      type: newTransaction.type,
-      amount: newTransaction.amount.toString(),
-      date: newTransaction.date,
-    }).toString();
-  
- 
     router.push('/(tabs)/HomeScreen');
   };
 
+  const handlePress = (type: 'income' | 'expense') => {
+    setSelectedType(type);
+    setModalVisible(true);
+  };
+
+  const resetTransactionType = () => {
+    setSelectedType(null);
+    setSelectedCategory(null);
+    setTransactionData({ ...transactionData, type: '' });
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Loại giao dịch:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập loại giao dịch (VD: Tiền ăn)"
-        value={transactionData.type}
-        onChangeText={(text) => handleInputChange('type', text)}
-      />
+    <View className="flex-1 bg-white px-4 py-4">
+      <View className="flex-1">
+        <Text className="text-5xl font-interBold text-blue-600 text-center">SpendVibe</Text>
 
-      <Text style={styles.label}>Số tiền:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập số tiền (VD: 100000)"
-        value={transactionData.amount}
-        onChangeText={(text) => handleInputChange('amount', text)}
-        keyboardType="numeric"
-      />
+        {!selectedCategory ? (
+          <>
+            <Text className="text-lg font-interBold mb-2 mt-3">Loại giao dịch:</Text>
+            <View className="flex-row space-x-2 ">
+              <Pressable className="bg-blue-600 py-2 px-4 rounded-2xl " onPress={() => handlePress('income')}>
+                <Text className="font-interBold text-lg text-center text-white">Thu nhập</Text>
+              </Pressable>
+              <Pressable className="bg-blue-600 py-2 px-4 rounded-2xl" onPress={() => handlePress('expense')}>
+                <Text className="font-interBold text-lg text-center text-white">Chi tiêu</Text>
+              </Pressable>
+            </View>
+          </>
+        ) : (
+          <View className="flex-row justify-between items-center mt-3 ">
+            <Text className="text-lg font-interBold">Loại giao dịch: {selectedCategory}</Text>
+            <Pressable className="bg-red-500 py-2 px-4 rounded-md" onPress={resetTransactionType}>
+            <Feather name="trash" size={24} color="white" />
+            </Pressable>
+          </View>
+        )}
 
-      <Text style={styles.label}>Ngày giao dịch:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập ngày (VD: 2025-02-05)"
-        value={transactionData.date}
-        onChangeText={(text) => handleInputChange('date', text)}
-      />
+        <Text className="text-lg font-interBold mt-4 mb-2">Số tiền:</Text>
+        <TextInput
+          className="border border-gray-300 p-3 rounded mb-4"
+          placeholder="Nhập số tiền (VD: 100000)"
+          value={transactionData.amount}
+          onChangeText={(text) => handleInputChange('amount', text)}
+          keyboardType="numeric"
+        />
 
-      <Button title="Thêm giao dịch" onPress={handleAddTransaction} />
+        <Text className="text-lg font-interBold mb-2">Ngày giao dịch:</Text>
+        <Pressable className="border border-gray-300 p-3 rounded mb-4 bg-gray-100" onPress={() => setShowDatePicker(true)}>
+          <Text className="text-gray-700">{transactionData.date ? transactionData.date.toString() : 'Chọn ngày'}</Text>
+        </Pressable>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={transactionData.date ? new Date(transactionData.date) : new Date()}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate?: Date) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                handleInputChange('date', selectedDate.toISOString().split('T')[0]);
+              }
+            }}
+          />
+        )}
+
+        <Button title="Thêm giao dịch" onPress={handleAddTransaction} color="blue" />
+
+        <View className="mt-4">
+          <Button title="Scan bill" onPress={() => {}} color="blue" />
+        </View>
+      </View>
+
+      <Navbar />
+
+      <Modal visible={modalVisible} transparent animationType="slide">
+        <View className="flex-1 justify-center items-center bg-blue-100 bg-opacity-50">
+          <View className="bg-white p-6 rounded-lg w-4/5 font-interBold">
+            <Text className="text-2xl font-interBold mb-4">
+              Chọn {selectedType === 'income' ? 'mục Thu nhập' : 'mục Chi tiêu'}
+            </Text>
+            <FlatList
+              data={selectedType ? transactionCategories[selectedType] : []}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <Pressable
+                  className="py-2 px-4 bg-gray-200 rounded-md mb-2"
+                  onPress={() => {
+                    setSelectedCategory(item);
+                    setTransactionData({ ...transactionData, type: selectedType! });
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text className="text-base">{item}</Text>
+                </Pressable>
+              )}
+            />
+            <Pressable className="mt-4 bg-blue-600 py-2 px-4 rounded-md" onPress={() => setModalVisible(false)}>
+              <Text className="text-white text-center font-interBold">Đóng</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#E3F2FD',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 15,
-  },
-});
 
 export default TransactionInputScreen;

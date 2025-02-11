@@ -92,7 +92,7 @@ const HomeScreen = () => {
     <View className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row justify-between items-center p-4 mt-5">
-        <Text className="text-2xl font-bold text-blue-600">SpendVibe</Text>
+        <Text className="text-2xl font-interBold text-blue-600">SpendVibe</Text>
         <View className="flex-row items-center">
           <Text className="text-lg font-bold text-blue-600 mr-2">User</Text>
           <FontAwesome name="user-circle-o" size={24} color="#2563EB" />
