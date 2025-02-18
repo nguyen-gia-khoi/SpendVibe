@@ -4,10 +4,6 @@ import { useRouter, router } from "expo-router";
 import { useEffect, useState } from "react";
 import auth from '@react-native-firebase/auth';
 import { ActivityIndicator } from "react-native";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import Feather from '@expo/vector-icons/Feather';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import Navbar from "./navbar";
 
 
@@ -55,7 +51,7 @@ const router = useRouter();
       {/* tong so tien da chi tieu */}
       <View className="mt-8 bg-white rounded-xl shadow-md p-6">
         <Text className="text-lg font-semibold text-blue-700">Total Spent</Text>
-        <Text className="text-2xl font-bold text-blue-500 mt-2">$1,250.00</Text>
+        <Text className="text-2xl font-bold text-blue-500 mt-2">1.250.000</Text>
       </View>
 
       {/* nut logout */}
@@ -63,7 +59,7 @@ const router = useRouter();
 
         <TouchableOpacity
           onPress={logout}
-          className="mt-4 bg-blue-500 py-3 rounded-2xl items-center mx-2"
+          className="mt-4 bg-blue-600 py-3 rounded-2xl items-center mx-2"
         >
           <Text className="text-white font-semibold text-2xl">Logout</Text>
         </TouchableOpacity>

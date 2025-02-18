@@ -48,7 +48,7 @@ export default function SignUp() {
 
   return (
     <View className="flex-1 bg-gray-100 p-5 justify-center">
-      <Text className="text-4xl font-bold text-blue-500 text-center mb-10">SpendVibe</Text>
+      <Text className="text-6xl font-bold text-blue-500 text-center mb-10">SpendVibe</Text>
       {error ? <Text className="text-red-500 text-center mb-2">{error}</Text> : null}
 
       <Text className="text-lg text-gray-700 font-semibold">Email</Text>

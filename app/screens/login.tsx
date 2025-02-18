@@ -5,6 +5,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import auth from '@react-native-firebase/auth';
 import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
+
 const Login = () => {
     const router = useRouter();
     const [email, setEmail] = useState("");

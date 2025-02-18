@@ -75,8 +75,8 @@ const TransactionInputScreen = () => {
   };
 
   return (
-    <View className="flex-1 bg-white px-4 py-4">
-      <View className="flex-1">
+    <View className="flex-1">
+      <View className="flex-1 px-4 py-6">
         <Text className="text-5xl font-interBold text-blue-600 text-center">SpendVibe</Text>
 
         {!selectedCategory ? (
@@ -135,8 +135,6 @@ const TransactionInputScreen = () => {
         </View>
       </View>
 
-      <Navbar />
-
       <Modal visible={modalVisible} transparent animationType="slide">
         <View className="flex-1 justify-center items-center bg-blue-100 bg-opacity-50">
           <View className="bg-white p-6 rounded-lg w-4/5 font-interBold">
@@ -165,6 +163,12 @@ const TransactionInputScreen = () => {
           </View>
         </View>
       </Modal>
+
+      
+      <View>
+      <Navbar />
+      </View>
+      
     </View>
   );
 };
