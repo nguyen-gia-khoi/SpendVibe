@@ -5,6 +5,13 @@ import { router } from 'expo-router';
 import Navbar from './navbar';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Feather from '@expo/vector-icons/Feather';
+import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
+import * as FileSystem from 'expo-file-system';
+
+
+const GOOGLE_VISION_API_KEY = 'AIzaSyA6AjixXUNl-y2egUortvsH8H6G8w0azpg';
+
 
 interface TransactionInputData {
   type: string;
@@ -36,6 +43,7 @@ const transactionCategories = {
 
 const TransactionInputScreen = () => {
   const navigation = useNavigation();
+
   const [transactionData, setTransactionData] = useState<TransactionInputData>({
     type: '',
     amount: '',
@@ -46,6 +54,85 @@ const TransactionInputScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<'income' | 'expense' | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  
+    // 🖼️ Chọn ảnh từ thư viện
+    const pickImage = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
+  
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+        recognizeText(result.assets[0].uri);
+      }
+    };
+  
+    // 🔄 Chuyển ảnh thành base64
+    const convertImageToBase64 = async (imageUri: string): Promise<string> => {
+      return await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
+    };
+  
+    // 🧠 Gửi ảnh lên Google Vision API để lấy văn bản
+    const recognizeText = async (imageUri: string) => {
+      try {
+        setLoading(true);
+        const base64Image = await convertImageToBase64(imageUri);
+  
+        const response = await axios.post(
+          `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`,
+          {
+            requests: [
+              {
+                image: { content: base64Image },
+                features: [{ type: "TEXT_DETECTION" }],
+              },
+            ],
+          }
+        );
+  
+        const textAnnotations = response.data.responses[0]?.textAnnotations;
+        console.log("OCR Response:", response.data.responses[0]);
+        if (textAnnotations && textAnnotations.length > 0) {
+          const extractedText = textAnnotations[0].description;
+          console.log("OCR Result:", extractedText);
+          
+          // Tìm tổng tiền từ hóa đơn
+          const totalAmount = extractTotalAmount(extractedText);
+          if (totalAmount) {
+            setTransactionData({ ...transactionData, amount: totalAmount });
+            Alert.alert("Tổng tiền:", `Đã nhận diện được số tiền: ${totalAmount}`);
+          } else {
+            Alert.alert("Không tìm thấy tổng tiền trong hóa đơn!");
+          }
+        } else {
+          Alert.alert("Không tìm thấy văn bản!");
+        }
+      } catch (error) {
+        console.error("Lỗi OCR:", error);
+        Alert.alert("Lỗi khi nhận diện văn bản!");
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    // 🔎 Tìm tổng tiền trong văn bản OCR
+    // const extractTotalAmount = (text: string): string | null => {
+    //   // const regex = /(?:Tổng cộng|Tổng tiền|Total|Amount|Grand Total)[:\s]*([\d,.]+)/i;
+    //   const regex = /(?:Tổng cộng|Tổng tiền|Total|Amount|Grand Total)[^\d]*([\d,.]+)/i;
+    //   const match = text.match(regex);
+    //   return match ? match[1].replace(/,/g, '') : null;
+    // };
+  
+    const extractTotalAmount = (text: string): string | null => {
+      const regex = /(?:Tổng cộng|Tổng tiền|Tổng|Total|Amount|Grand Total)[^\d]*([\d,.]+)/i;
+      const match = text.match(regex);
+      console.log("Regex Match:", match); // Kiểm tra xem regex có tìm thấy kết quả không
+      return match ? match[1].replace(/,/g, '') : null;
+    };
 
   const handleInputChange = (name: string, value: string) => {
     setTransactionData({
@@ -131,7 +218,7 @@ const TransactionInputScreen = () => {
         <Button title="Thêm giao dịch" onPress={handleAddTransaction} color="blue" />
 
         <View className="mt-4">
-          <Button title="Scan bill" onPress={() => {}} color="blue" />
+          <Button title="Scan bill" onPress={pickImage} color="blue" />
         </View>
       </View>
 
