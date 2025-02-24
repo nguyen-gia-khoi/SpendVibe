@@ -174,3 +174,223 @@ const TransactionInputScreen = () => {
 };
 
 export default TransactionInputScreen;
+
+
+
+// import React, { useState } from "react";
+// import { View, Text, TouchableOpacity, Image, ScrollView, ActivityIndicator } from "react-native";
+// import * as ImagePicker from "expo-image-picker";
+// import axios from "axios";
+// import { MediaTypeOptions } from '../../node_modules/expo-image-picker/build/ImagePicker.types';
+
+// const GOOGLE_VISION_API_KEY = "AIzaSyA6AjixXUNl-y2egUortvsH8H6G8w0azpg"; // 🔑 Nhập API Key của bạn
+
+// const OCRScan = () => {
+//   const [imageUri, setImageUri] = useState<string | null>(null);
+//   const [textResult, setTextResult] = useState<string | null>(null);
+//   const [loading, setLoading] = useState(false);
+
+//   // 🖼️ Chọn ảnh từ thư viện
+//   const pickImage = async () => {
+//     let result = await ImagePicker.launchImageLibraryAsync({
+//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+//       allowsEditing: true,
+//       quality: 1,
+//     });
+
+//     if (!result.canceled) {
+//       setImageUri(result.assets[0].uri);
+//       recognizeText(result.assets[0].uri);
+//     }
+//   };
+
+//   // 🧠 Gửi ảnh lên Google Cloud Vision API để nhận diện văn bản
+//   const recognizeText = async (imageUri: string) => {
+//     try {
+//       setLoading(true);
+//       setTextResult(null);
+
+//       // Chuyển ảnh thành base64
+//       const base64Image = await convertImageToBase64(imageUri);
+
+//       const response = await axios.post(
+//         `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`,
+//         {
+//           requests: [
+//             {
+//               image: { content: base64Image },
+//               features: [{ type: "TEXT_DETECTION" }],
+//             },
+//           ],
+//         }
+//       );
+
+//       const textAnnotations = response.data.responses[0].textAnnotations;
+//       if (textAnnotations && textAnnotations.length > 0) {
+//         setTextResult(textAnnotations[0].description);
+//       } else {
+//         setTextResult("Không tìm thấy văn bản nào!");
+//       }
+//     } catch (error) {
+//       console.error("Lỗi OCR:", error);
+//       setTextResult("Lỗi khi nhận diện văn bản.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // 🔄 Chuyển ảnh thành base64 để gửi lên API
+//   const convertImageToBase64 = async (imageUri: string): Promise<string> => {
+//     const response = await fetch(imageUri);
+//     const blob = await response.blob();
+//     return new Promise((resolve, reject) => {
+//       const reader = new FileReader();
+//       reader.onloadend = () => {
+//         const base64data = reader.result?.toString().split(",")[1];
+//         resolve(base64data || "");
+//       };
+//       reader.onerror = reject;
+//       reader.readAsDataURL(blob);
+//     });
+//   };
+
+// console.log(textResult);
+
+//   return (
+//     <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 20 }}>
+//       <TouchableOpacity onPress={pickImage} style={{ backgroundColor: "#007AFF", padding: 15, borderRadius: 10 }}>
+//         <Text style={{ color: "white", fontWeight: "bold" }}>📷 Chọn Ảnh</Text>
+//       </TouchableOpacity>{imageUri && <Image source={{ uri: imageUri }} style={{ width: 200, height: 200, marginTop: 20 }} />}
+
+//       {loading && <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />}
+
+//       {textResult && (
+//         <ScrollView style={{ marginTop: 20, maxHeight: 300, width: "100%", backgroundColor: "#f0f0f0", padding: 10, borderRadius: 10 }}>
+//           <Text>{textResult}</Text>
+//         </ScrollView>
+//       )}
+//     </View>
+//   );
+// };
+
+
+// export default OCRScan;
+
+
+
+// import React, { useState } from 'react';
+// import { View, TextInput, Button, Text, Alert, Pressable, Modal, FlatList, Image, ActivityIndicator } from 'react-native';
+// import * as ImagePicker from 'expo-image-picker';
+// import * as FileSystem from 'expo-file-system';
+// import axios from 'axios';
+
+// const GOOGLE_VISION_API_KEY = "AIzaSyA6AjixXUNl-y2egUortvsH8H6G8w0azpg"; // 🔑 Thay bằng API Key của bạn
+
+// const TransactionInputScreen = () => {
+//   const [transactionData, setTransactionData] = useState({ type: '', amount: '', date: '' });
+//   const [loading, setLoading] = useState(false);
+//   const [imageUri, setImageUri] = useState<string | null>(null);
+
+//   // 🖼️ Chọn ảnh từ thư viện
+//   const pickImage = async () => {
+//     let result = await ImagePicker.launchImageLibraryAsync({
+//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+//       allowsEditing: true,
+//       quality: 1,
+//     });
+
+//     if (!result.canceled) {
+//       setImageUri(result.assets[0].uri);
+//       recognizeText(result.assets[0].uri);
+//     }
+//   };
+
+//   // 🔄 Chuyển ảnh thành base64
+//   const convertImageToBase64 = async (imageUri: string): Promise<string> => {
+//     return await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
+//   };
+
+//   // 🧠 Gửi ảnh lên Google Vision API để lấy văn bản
+//   const recognizeText = async (imageUri: string) => {
+//     try {
+//       setLoading(true);
+//       const base64Image = await convertImageToBase64(imageUri);
+
+//       const response = await axios.post(
+//         `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`,
+//         {
+//           requests: [
+//             {
+//               image: { content: base64Image },
+//               features: [{ type: "TEXT_DETECTION" }],
+//             },
+//           ],
+//         }
+//       );
+
+//       const textAnnotations = response.data.responses[0]?.textAnnotations;
+//       console.log("OCR Response:", response.data.responses[0]);
+//       if (textAnnotations && textAnnotations.length > 0) {
+//         const extractedText = textAnnotations[0].description;
+//         console.log("OCR Result:", extractedText);
+        
+//         // Tìm tổng tiền từ hóa đơn
+//         const totalAmount = extractTotalAmount(extractedText);
+//         if (totalAmount) {
+//           setTransactionData({ ...transactionData, amount: totalAmount });
+//           Alert.alert("Tổng tiền:", `Đã nhận diện được số tiền: ${totalAmount}`);
+//         } else {
+//           Alert.alert("Không tìm thấy tổng tiền trong hóa đơn!");
+//         }
+//       } else {
+//         Alert.alert("Không tìm thấy văn bản!");
+//       }
+//     } catch (error) {
+//       console.error("Lỗi OCR:", error);
+//       Alert.alert("Lỗi khi nhận diện văn bản!");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // 🔎 Tìm tổng tiền trong văn bản OCR
+//   // const extractTotalAmount = (text: string): string | null => {
+//   //   // const regex = /(?:Tổng cộng|Tổng tiền|Total|Amount|Grand Total)[:\s]*([\d,.]+)/i;
+//   //   const regex = /(?:Tổng cộng|Tổng tiền|Total|Amount|Grand Total)[^\d]*([\d,.]+)/i;
+//   //   const match = text.match(regex);
+//   //   return match ? match[1].replace(/,/g, '') : null;
+//   // };
+
+//   const extractTotalAmount = (text: string): string | null => {
+//     const regex = /(?:Tổng cộng|Tổng tiền|Tổng|Total|Amount|Grand Total)[^\d]*([\d,.]+)/i;
+//     const match = text.match(regex);
+//     console.log("Regex Match:", match); // Kiểm tra xem regex có tìm thấy kết quả không
+//     return match ? match[1].replace(/,/g, '') : null;
+//   };
+  
+//   return (
+//     <View className="flex-1 px-4 py-6">
+//       <Text className="text-5xl font-interBold text-blue-600 text-center">SpendVibe</Text>
+
+//       <Text className="text-lg font-interBold mt-4 mb-2">Số tiền:</Text>
+//       <TextInput
+//         className="border border-gray-300 p-3 rounded mb-4"
+//         placeholder="Nhập số tiền (VD: 100000)"
+//         value={transactionData.amount}
+//         onChangeText={(text) => setTransactionData({ ...transactionData, amount: text })}
+//         keyboardType="numeric"
+//       />
+
+//       {/* Nút Scan Bill */}
+//       <Pressable className="bg-blue-600 py-2 px-4 rounded-2xl mt-2" onPress={pickImage}>
+//         <Text className="font-interBold text-lg text-center text-white">📷 Scan Bill</Text>
+//       </Pressable>
+
+//       {loading && <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />}
+
+//       {imageUri && <Image source={{ uri: imageUri }} style={{ width: 200, height: 200, marginTop: 20 }} />}
+//     </View>
+//   );
+// };
+
+// export default TransactionInputScreen;
