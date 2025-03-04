@@ -162,7 +162,7 @@ const TransactionInputScreen = () => {
   };
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-gray-200">
       <View className="flex-1 px-4 py-6">
         <Text className="text-5xl font-interBold text-blue-600 text-center">SpendVibe</Text>
 

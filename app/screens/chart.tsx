@@ -26,14 +26,25 @@ const LineChartExample = ({ chartData, legend }: { chartData: number[]; legend: 
 
   return (
     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-      <LineChart
-        data={data}
-        width={screenWidth - 40}
-        height={250}
-        chartConfig={chartConfig}
-        bezier
-      />
-    </View>
+    <LineChart
+      data={data}
+      width={screenWidth - 40}
+      height={250}
+      chartConfig={{
+        ...chartConfig,
+        backgroundGradientFrom: '#F3F4F6', 
+        backgroundGradientTo: '#F3F4F6', 
+        decimalPlaces: 2,
+        color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`, 
+        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, 
+      }}
+      bezier
+      style={{
+        borderRadius: 16,
+        overflow: 'hidden',
+      }}
+    />
+  </View>
   );
 };
 
