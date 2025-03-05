@@ -39,7 +39,7 @@ const router = useRouter();
   }
 
   return(
-    <View className="flex-1">
+    <View className="flex-1 bg-gray-200">
         
         <View className="items-center mt-10">
         <Text className="text-2xl font-bold text-blue-800 mt-4">

@@ -3,14 +3,10 @@ import { useNavigation } from '@react-navigation/native';
 import { Eye, EyeOff } from "lucide-react-native";
 import { View, Text, FlatList, TouchableOpacity, Pressable } from 'react-native';
 import LineChartExample from '../screens/chart';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, router } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
-import Navbar from '../screens/navbar';
+import Navbar from '@/app/screens/navbar';
 
 
 interface TransactionData {
@@ -89,34 +85,38 @@ const HomeScreen = () => {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-gray-200 ">
       {/* Header */}
+      <View className='rounded-b-3xl bg-blue-500'>
       <View className="flex-row justify-between items-center p-4 mt-5">
-        <Text className="text-2xl font-interBold text-blue-600">SpendVibe</Text>
+        <Text className="text-2xl font-interBold text-white">SpendVibe</Text>
         <View className="flex-row items-center">
-          <Text className="text-lg font-interBold text-blue-600 mr-2">User</Text>
-          <FontAwesome name="user-circle-o" size={24} color="#2563EB" />
+          <Text className="text-lg font-interBold text-white mr-2">User</Text>
+          <FontAwesome name="user-circle-o" size={24} color="white" />
         </View>
       </View>
       
-      {/* Body */}
-      <View className="flex-1 px-4">
-
+      
+      <View className='px-4'>
         {/* Số dư hiện tại */}
-        <View className="bg-blue-600 rounded-2xl p-3 items-center  mb-6">
-          <Text className="text-lg font-bold text-white mb-2">Số dư hiện tại</Text>
+        <View className="bg-white p-3 items-center mb-6 rounded-3xl">
+          <Text className="text-lg font-bold text-blue-500 mb-2">Số dư hiện tại</Text>
           <View className="flex-row items-center">
-            <Text className="text-2xl font-bold text-white mr-3">
+            <Text className="text-2xl font-bold text-blue-500 mr-3">
               {isVisible ? "1.000.000.000.000.000.000" : "******"}
             </Text>
             <TouchableOpacity onPress={() => setIsVisible(!isVisible)}>
-              {isVisible ? <EyeOff size={24} color="white" /> : <Eye size={24} color="white" />}
+              {isVisible ? <EyeOff size={24} color="#2563EB" /> : <Eye size={24} color="#2563EB" />}
             </TouchableOpacity>
           </View>
         </View>
-
+        </View>
+      </View>
+      
+        {/* Body */}
         {/* Buttons Thu nhập / Chi tiêu */}
-        <View className="flex-row justify-start gap-x-4 mb-6">
+        <View className=' bg-gray-200 flex-1'>
+        <View className="flex-row justify-start gap-x-4 mb-4 p-3">
         <TouchableOpacity
           className={`px-4 py-2 rounded-full ${
             selectedChart === 'Thu nhập' ? 'bg-blue-600' : 'bg-gray-300'
@@ -136,7 +136,10 @@ const HomeScreen = () => {
       </View>
 
         {/* Biểu đồ */}
-        <LineChartExample chartData={chartData} legend={selectedChart} />
+        
+          <LineChartExample chartData={chartData} legend={selectedChart} />
+        
+        
 
         {/* Transaction History */}
         <Text className="text-lg font-bold text-blue-600 ml-5 mb-2 mt-4">Lịch sử thu chi</Text>
@@ -152,7 +155,6 @@ const HomeScreen = () => {
           )}
         />
       </View>
-      
       {/* Navbar */}
       <Navbar />
     </View>

@@ -21,30 +21,28 @@ export default function Navbar() {
           };
     return(
         
-        <View className="flex-row justify-around p-4 border-t border-blue-600 items-center">
-        <TouchableOpacity onPress={() => backHome()}>
-          <MaterialIcons name="home" size={30} color="rgb(57, 30, 191)" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Feather name="edit" size={30} color="rgb(57, 30, 191)" />
-        </TouchableOpacity>
-        <View className="absolute -top-8 left-1/2">
-          <TouchableOpacity
-            className="w-16 h-16 rounded-full bg-blue-600 justify-center items-center shadow-lg"
-            onPress={() => updateThuChi()}
-          >
-            <AntDesign name="plus" size={30} color="white" />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity>
-          <Ionicons name="notifications-outline" size={30} color="rgb(57, 30, 191)" />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => proFile()}>
-          <AntDesign name="user" size={24} color="rgb(57, 30, 191)" />
-
+      <View className="flex-row justify-around p-4 items-center bg-white rounded-t-3xl">
+      <TouchableOpacity onPress={() => backHome()}>
+        <MaterialIcons name="home" size={30} color="#2563EB" />
+      </TouchableOpacity>
+      <TouchableOpacity>
+        <Feather name="edit" size={30} color="#2563EB" />
+      </TouchableOpacity>
+      <View className="absolute -top-8 left-1/2">
+        <TouchableOpacity
+          className="w-16 h-16 rounded-full bg-blue-600 justify-center items-center shadow-lg"
+          onPress={() => updateThuChi()}
+        >
+          <AntDesign name="plus" size={30} color="white" />
         </TouchableOpacity>
       </View>
+      <TouchableOpacity>
+        <Ionicons name="notifications-outline" size={30} color="#2563EB" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => proFile()}>
+        <AntDesign name="user" size={24} color="#2563EB" />
+      </TouchableOpacity>
+    </View>
       
     )
 }
