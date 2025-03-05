@@ -9,8 +9,16 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const GOOGLE_VISION_API_KEY = 'AIzaSyA6AjixXUNl-y2egUortvsH8H6G8w0azpg';
+
+
+const genAI = new GoogleGenerativeAI("AIzaSyBgte7Mk-wy-XcxRan_-cK82-Iei9ZKLec");
+
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+
 
 
 interface TransactionInputData {
@@ -128,7 +136,7 @@ const TransactionInputScreen = () => {
     // };
   
     const extractTotalAmount = (text: string): string | null => {
-      const regex = /(?:Tổng cộng|Tổng tiền|Tổng|Total|Amount|Grand Total)[^\d]*([\d,.]+)/i;
+      const regex = /(?:Tổng cộng|Tổng tiền|Tổng:|Total|Amount|Grand Total)[^\d]*([\d,.]+)/i;
       const match = text.match(regex);
       console.log("Regex Match:", match); // Kiểm tra xem regex có tìm thấy kết quả không
       return match ? match[1].replace(/,/g, '') : null;
