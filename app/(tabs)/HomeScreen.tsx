@@ -6,6 +6,7 @@ import LineChartExample from '../screens/chart';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, router } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
+import auth from "@react-native-firebase/auth"
 import Navbar from '@/app/screens/navbar';
 
 
@@ -20,6 +21,7 @@ const HomeScreen = () => {
   const { id, type, amount, date } = useLocalSearchParams();
   const navigation = useNavigation();
   const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [activeChart, setActiveChart] = useState<"income" | "expense">("income"); // State để kiểm soát biểu đồ
   const [ThuChi, setThuChi] = useState<TransactionData[]>([
     { id: '1', type: 'Chi phí sinh hoạt', amount: -100, date: '2025-01-01' },
@@ -61,6 +63,23 @@ const HomeScreen = () => {
   }, [id, type, amount, date]);
 
   useEffect(() => {
+    const fetchUserInfo = async () => {
+      const user = auth().currentUser;
+      console.log("User:", user);
+      if (user) {
+        try {
+      
+          setDisplayName(user.displayName);
+        } catch (error) {
+          console.error("Lỗi khi gọi API lấy user:", error);
+        }
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  useEffect(() => {
     const newChartData = Array(12).fill(0);
   
     ThuChi.filter(item =>
@@ -91,7 +110,7 @@ const HomeScreen = () => {
       <View className="flex-row justify-between items-center p-4 mt-5">
         <Text className="text-2xl font-interBold text-white">SpendVibe</Text>
         <View className="flex-row items-center">
-          <Text className="text-lg font-interBold text-white mr-2">User</Text>
+          <Text className="text-lg font-interBold text-white mr-2">{displayName ? displayName : "User"}</Text>
           <FontAwesome name="user-circle-o" size={24} color="white" />
         </View>
       </View>
