@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button, Text, Alert, Pressable, Modal, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
@@ -11,7 +11,9 @@ import * as FileSystem from 'expo-file-system';
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const GOOGLE_VISION_API_KEY = 'AIzaSyA6AjixXUNl-y2egUortvsH8H6G8w0azpg';
+const GOOGLE_VISION_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY;
+const GOOGLE_GENERATIVE_AI_KEY = process.env.EXPO_PUBLIC_GOOGLE_GENERATIVE_AI_KEY;
+
 
 
 const genAI = new GoogleGenerativeAI("AIzaSyBgte7Mk-wy-XcxRan_-cK82-Iei9ZKLec");
@@ -25,6 +27,8 @@ interface TransactionInputData {
   type: string;
   amount: string;
   date: string;
+  category?: string;
+  note?: string;
 }
 
 const transactionCategories = {
@@ -56,15 +60,17 @@ const TransactionInputScreen = () => {
     type: '',
     amount: '',
     date: '',
+    category: '',
+    note: '' ,
   });
-
+  
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<'income' | 'expense' | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
-  
+  const [note, setNote] = useState("");
     // 🖼️ Chọn ảnh từ thư viện
     const pickImage = async () => {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -83,7 +89,58 @@ const TransactionInputScreen = () => {
     const convertImageToBase64 = async (imageUri: string): Promise<string> => {
       return await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
     };
-  
+    
+    const processTextWithGemini = async (extractedText: string) => {
+      try {
+        const prompt = `
+          Tôi sẽ cung cấp cho bạn nội dung của một hóa đơn. Hãy trích xuất thông tin sau:
+          - Tổng số tiền của hóa đơn nếu là chi tiêu thì sẽ ghi là (-100.000), nếu là thu nhập thì sẽ ghi là (100.000)
+          - Danh mục chi tiêu ('Chi phí sinh hoạt',
+                                'Phương tiện đi lại',
+                                'Mua sắm cá nhân',
+                                'Giải trí & Du lịch',
+                                'Giáo dục',
+                                'Sức khỏe',
+                                'Đầu tư & Tiết kiệm',
+                                'Khác')
+          - Ngày của hóa đơn
+    
+          Đây là nội dung hóa đơn:
+          "${extractedText}"
+    
+          Trả lời kết quả theo JSON có format:
+          {
+            "totalAmount": "số tiền",
+            "category": "danh mục",
+            "date": "ngày"
+          }
+        `;
+    
+        const result = await model.generateContent(prompt);
+    
+        if (!result.response || !result.response.text) {
+          throw new Error("Không nhận được phản hồi từ Gemini.");
+        }
+    
+        let responseText = result.response.text().trim();
+    
+        console.log("Gemini Response:", responseText);
+    
+        // Loại bỏ các ký tự ```json và ```
+        responseText = responseText.replace(/^```json/, "").replace(/```$/, "").trim();
+    
+        console.log("Cleaned Response:", responseText);
+    
+        // Parse JSON
+        const jsonResponse = JSON.parse(responseText);
+        
+        return jsonResponse;
+      } catch (error) {
+        console.error("Lỗi xử lý Gemini:", error);
+        return null;
+      }
+    };
+    
     // 🧠 Gửi ảnh lên Google Vision API để lấy văn bản
     const recognizeText = async (imageUri: string) => {
       try {
@@ -109,13 +166,24 @@ const TransactionInputScreen = () => {
           console.log("OCR Result:", extractedText);
           
           // Tìm tổng tiền từ hóa đơn
-          const totalAmount = extractTotalAmount(extractedText);
-          if (totalAmount) {
-            setTransactionData({ ...transactionData, amount: totalAmount });
-            Alert.alert("Tổng tiền:", `Đã nhận diện được số tiền: ${totalAmount}`);
-          } else {
-            Alert.alert("Không tìm thấy tổng tiền trong hóa đơn!");
-          }
+          const categorizedData = await processTextWithGemini(extractedText);
+      console.log("Gemini Categorized Data:", categorizedData);
+
+      if (categorizedData) {
+        setTransactionData({
+          ...transactionData,
+          amount: categorizedData.totalAmount,
+          category: categorizedData.category,
+          date: categorizedData.date,
+        });
+
+        Alert.alert(
+          "Kết quả phân loại",
+          `Danh mục: ${categorizedData.category}\nTổng tiền: ${categorizedData.totalAmount}\nNgày: ${categorizedData.date}`
+        );
+      } else {
+        Alert.alert("Không thể phân loại dữ liệu!");
+      }
         } else {
           Alert.alert("Không tìm thấy văn bản!");
         }
@@ -168,7 +236,10 @@ const TransactionInputScreen = () => {
     setSelectedCategory(null);
     setTransactionData({ ...transactionData, type: '' });
   };
-
+  
+  useEffect(() => {
+    setTransactionData({ ...transactionData, note });
+  }, [note]);
   return (
     <View className="flex-1 bg-gray-200">
       <View className="flex-1 px-4 py-6">
@@ -203,7 +274,23 @@ const TransactionInputScreen = () => {
           onChangeText={(text) => handleInputChange('amount', text)}
           keyboardType="numeric"
         />
-
+        <Text className="text-lg font-interBold mb-2">Danh mục:</Text>
+          <TextInput
+            className="border border-gray-300 p-3 rounded mb-4 bg-gray-100"
+            placeholder="Danh mục"
+            value={transactionData.category}
+            editable={false} // Không cho nhập tay, chỉ chọn từ OCR hoặc danh sách
+          />
+          <View className="mt-4">
+            <Text className="text-lg font-interBold mb-2">Ghi chú:</Text>
+            <TextInput
+              className="border border-gray-300 rounded-lg p-3 text-lg"
+              placeholder="Nhập ghi chú (tùy chọn)"
+              value={note}
+              onChangeText={setNote}
+              multiline
+            />
+          </View>
         <Text className="text-lg font-interBold mb-2">Ngày giao dịch:</Text>
         <Pressable className="border border-gray-300 p-3 rounded mb-4 bg-gray-100" onPress={() => setShowDatePicker(true)}>
           <Text className="text-gray-700">{transactionData.date ? transactionData.date.toString() : 'Chọn ngày'}</Text>
@@ -244,7 +331,7 @@ const TransactionInputScreen = () => {
                   className="py-2 px-4 bg-gray-200 rounded-md mb-2"
                   onPress={() => {
                     setSelectedCategory(item);
-                    setTransactionData({ ...transactionData, type: selectedType! });
+                    setTransactionData({ ...transactionData, type: selectedType!,category: item, });
                     setModalVisible(false);
                   }}
                 >
@@ -271,221 +358,3 @@ const TransactionInputScreen = () => {
 export default TransactionInputScreen;
 
 
-
-// import React, { useState } from "react";
-// import { View, Text, TouchableOpacity, Image, ScrollView, ActivityIndicator } from "react-native";
-// import * as ImagePicker from "expo-image-picker";
-// import axios from "axios";
-// import { MediaTypeOptions } from '../../node_modules/expo-image-picker/build/ImagePicker.types';
-
-// const GOOGLE_VISION_API_KEY = "AIzaSyA6AjixXUNl-y2egUortvsH8H6G8w0azpg"; // 🔑 Nhập API Key của bạn
-
-// const OCRScan = () => {
-//   const [imageUri, setImageUri] = useState<string | null>(null);
-//   const [textResult, setTextResult] = useState<string | null>(null);
-//   const [loading, setLoading] = useState(false);
-
-//   // 🖼️ Chọn ảnh từ thư viện
-//   const pickImage = async () => {
-//     let result = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//       allowsEditing: true,
-//       quality: 1,
-//     });
-
-//     if (!result.canceled) {
-//       setImageUri(result.assets[0].uri);
-//       recognizeText(result.assets[0].uri);
-//     }
-//   };
-
-//   // 🧠 Gửi ảnh lên Google Cloud Vision API để nhận diện văn bản
-//   const recognizeText = async (imageUri: string) => {
-//     try {
-//       setLoading(true);
-//       setTextResult(null);
-
-//       // Chuyển ảnh thành base64
-//       const base64Image = await convertImageToBase64(imageUri);
-
-//       const response = await axios.post(
-//         `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`,
-//         {
-//           requests: [
-//             {
-//               image: { content: base64Image },
-//               features: [{ type: "TEXT_DETECTION" }],
-//             },
-//           ],
-//         }
-//       );
-
-//       const textAnnotations = response.data.responses[0].textAnnotations;
-//       if (textAnnotations && textAnnotations.length > 0) {
-//         setTextResult(textAnnotations[0].description);
-//       } else {
-//         setTextResult("Không tìm thấy văn bản nào!");
-//       }
-//     } catch (error) {
-//       console.error("Lỗi OCR:", error);
-//       setTextResult("Lỗi khi nhận diện văn bản.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   // 🔄 Chuyển ảnh thành base64 để gửi lên API
-//   const convertImageToBase64 = async (imageUri: string): Promise<string> => {
-//     const response = await fetch(imageUri);
-//     const blob = await response.blob();
-//     return new Promise((resolve, reject) => {
-//       const reader = new FileReader();
-//       reader.onloadend = () => {
-//         const base64data = reader.result?.toString().split(",")[1];
-//         resolve(base64data || "");
-//       };
-//       reader.onerror = reject;
-//       reader.readAsDataURL(blob);
-//     });
-//   };
-
-// console.log(textResult);
-
-//   return (
-//     <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 20 }}>
-//       <TouchableOpacity onPress={pickImage} style={{ backgroundColor: "#007AFF", padding: 15, borderRadius: 10 }}>
-//         <Text style={{ color: "white", fontWeight: "bold" }}>📷 Chọn Ảnh</Text>
-//       </TouchableOpacity>{imageUri && <Image source={{ uri: imageUri }} style={{ width: 200, height: 200, marginTop: 20 }} />}
-
-//       {loading && <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />}
-
-//       {textResult && (
-//         <ScrollView style={{ marginTop: 20, maxHeight: 300, width: "100%", backgroundColor: "#f0f0f0", padding: 10, borderRadius: 10 }}>
-//           <Text>{textResult}</Text>
-//         </ScrollView>
-//       )}
-//     </View>
-//   );
-// };
-
-
-// export default OCRScan;
-
-
-
-// import React, { useState } from 'react';
-// import { View, TextInput, Button, Text, Alert, Pressable, Modal, FlatList, Image, ActivityIndicator } from 'react-native';
-// import * as ImagePicker from 'expo-image-picker';
-// import * as FileSystem from 'expo-file-system';
-// import axios from 'axios';
-
-// const GOOGLE_VISION_API_KEY = "AIzaSyA6AjixXUNl-y2egUortvsH8H6G8w0azpg"; // 🔑 Thay bằng API Key của bạn
-
-// const TransactionInputScreen = () => {
-//   const [transactionData, setTransactionData] = useState({ type: '', amount: '', date: '' });
-//   const [loading, setLoading] = useState(false);
-//   const [imageUri, setImageUri] = useState<string | null>(null);
-
-//   // 🖼️ Chọn ảnh từ thư viện
-//   const pickImage = async () => {
-//     let result = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//       allowsEditing: true,
-//       quality: 1,
-//     });
-
-//     if (!result.canceled) {
-//       setImageUri(result.assets[0].uri);
-//       recognizeText(result.assets[0].uri);
-//     }
-//   };
-
-//   // 🔄 Chuyển ảnh thành base64
-//   const convertImageToBase64 = async (imageUri: string): Promise<string> => {
-//     return await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
-//   };
-
-//   // 🧠 Gửi ảnh lên Google Vision API để lấy văn bản
-//   const recognizeText = async (imageUri: string) => {
-//     try {
-//       setLoading(true);
-//       const base64Image = await convertImageToBase64(imageUri);
-
-//       const response = await axios.post(
-//         `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`,
-//         {
-//           requests: [
-//             {
-//               image: { content: base64Image },
-//               features: [{ type: "TEXT_DETECTION" }],
-//             },
-//           ],
-//         }
-//       );
-
-//       const textAnnotations = response.data.responses[0]?.textAnnotations;
-//       console.log("OCR Response:", response.data.responses[0]);
-//       if (textAnnotations && textAnnotations.length > 0) {
-//         const extractedText = textAnnotations[0].description;
-//         console.log("OCR Result:", extractedText);
-        
-//         // Tìm tổng tiền từ hóa đơn
-//         const totalAmount = extractTotalAmount(extractedText);
-//         if (totalAmount) {
-//           setTransactionData({ ...transactionData, amount: totalAmount });
-//           Alert.alert("Tổng tiền:", `Đã nhận diện được số tiền: ${totalAmount}`);
-//         } else {
-//           Alert.alert("Không tìm thấy tổng tiền trong hóa đơn!");
-//         }
-//       } else {
-//         Alert.alert("Không tìm thấy văn bản!");
-//       }
-//     } catch (error) {
-//       console.error("Lỗi OCR:", error);
-//       Alert.alert("Lỗi khi nhận diện văn bản!");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   // 🔎 Tìm tổng tiền trong văn bản OCR
-//   // const extractTotalAmount = (text: string): string | null => {
-//   //   // const regex = /(?:Tổng cộng|Tổng tiền|Total|Amount|Grand Total)[:\s]*([\d,.]+)/i;
-//   //   const regex = /(?:Tổng cộng|Tổng tiền|Total|Amount|Grand Total)[^\d]*([\d,.]+)/i;
-//   //   const match = text.match(regex);
-//   //   return match ? match[1].replace(/,/g, '') : null;
-//   // };
-
-//   const extractTotalAmount = (text: string): string | null => {
-//     const regex = /(?:Tổng cộng|Tổng tiền|Tổng|Total|Amount|Grand Total)[^\d]*([\d,.]+)/i;
-//     const match = text.match(regex);
-//     console.log("Regex Match:", match); // Kiểm tra xem regex có tìm thấy kết quả không
-//     return match ? match[1].replace(/,/g, '') : null;
-//   };
-  
-//   return (
-//     <View className="flex-1 px-4 py-6">
-//       <Text className="text-5xl font-interBold text-blue-600 text-center">SpendVibe</Text>
-
-//       <Text className="text-lg font-interBold mt-4 mb-2">Số tiền:</Text>
-//       <TextInput
-//         className="border border-gray-300 p-3 rounded mb-4"
-//         placeholder="Nhập số tiền (VD: 100000)"
-//         value={transactionData.amount}
-//         onChangeText={(text) => setTransactionData({ ...transactionData, amount: text })}
-//         keyboardType="numeric"
-//       />
-
-//       {/* Nút Scan Bill */}
-//       <Pressable className="bg-blue-600 py-2 px-4 rounded-2xl mt-2" onPress={pickImage}>
-//         <Text className="font-interBold text-lg text-center text-white">📷 Scan Bill</Text>
-//       </Pressable>
-
-//       {loading && <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />}
-
-//       {imageUri && <Image source={{ uri: imageUri }} style={{ width: 200, height: 200, marginTop: 20 }} />}
-//     </View>
-//   );
-// };
-
-// export default TransactionInputScreen;
