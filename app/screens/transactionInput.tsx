@@ -10,6 +10,7 @@ import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { newTransaction } from '@/API/transactionAPI';
 
 const GOOGLE_VISION_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY;
 const GOOGLE_GENERATIVE_AI_KEY = process.env.EXPO_PUBLIC_GOOGLE_GENERATIVE_AI_KEY;
@@ -104,12 +105,13 @@ const TransactionInputScreen = () => {
                                 'Đầu tư & Tiết kiệm',
                                 'Khác')
           - Ngày của hóa đơn
-    
+          - loại thu chi (income/expense)
           Đây là nội dung hóa đơn:
           "${extractedText}"
     
           Trả lời kết quả theo JSON có format:
           {
+            "type": "income/expense",
             "totalAmount": "số tiền",
             "category": "danh mục",
             "date": "ngày"
@@ -172,6 +174,7 @@ const TransactionInputScreen = () => {
       if (categorizedData) {
         setTransactionData({
           ...transactionData,
+          type: categorizedData.type,
           amount: categorizedData.totalAmount,
           category: categorizedData.category,
           date: categorizedData.date,
@@ -179,7 +182,7 @@ const TransactionInputScreen = () => {
 
         Alert.alert(
           "Kết quả phân loại",
-          `Danh mục: ${categorizedData.category}\nTổng tiền: ${categorizedData.totalAmount}\nNgày: ${categorizedData.date}`
+          `Danh mục: ${categorizedData.type}\n ${categorizedData.category}\nTổng tiền: ${categorizedData.totalAmount}\nNgày: ${categorizedData.date}`
         );
       } else {
         Alert.alert("Không thể phân loại dữ liệu!");
@@ -217,14 +220,60 @@ const TransactionInputScreen = () => {
     });
   };
 
-  const handleAddTransaction = () => {
-    const { type, amount, date } = transactionData;
-    if (!type || !amount || !date) {
-      Alert.alert('Thông tin bị bỏ trống', 'Vui lòng nhập đầy đủ thông tin', [{ text: 'OK' }]);
-      return;
+  // const handleAddTransaction = async () => {
+    
+  //   try {
+  //     const { type, amount, date,note,category } = transactionData;
+  //   console.log("Transaction Data:", transactionData);
+  //   if ( !amount || !date) {
+  //     Alert.alert('Thông tin bị bỏ trống', 'Vui lòng nhập đầy đủ thông tin', [{ text: 'OK' }]);
+  //     return;
+  //   }
+  //     await newTransaction(type, amount, date, category, note);
+  //   } catch (error) {
+  //     console.error('Lỗi khi thêm giao dịch:', error);
+  //     Alert.alert('Lỗi khi thêm giao dịch', 'Vui lòng thử lại sau', [{ text: 'OK' }]);
+  //     return;
+      
+  //   }
+    
+  // };
+  const handleAddTransaction = async () => {
+    try {
+      const { type, amount, date, note, category } = transactionData;
+      console.log("Gửi dữ liệu giao dịch:", { type, amount, date, category, note });
+
+      console.log("Transaction Data Before Validation:", transactionData);
+  
+      if (!amount || !date || !category) {
+        Alert.alert('Thông tin bị bỏ trống', 'Vui lòng nhập đầy đủ thông tin', [{ text: 'OK' }]);
+        console.warn("Thiếu thông tin cần thiết:", { amount, date, type, category });
+        return;
+      }
+  
+      console.log("Gửi dữ liệu giao dịch:", { type, amount, date, category, note });
+  
+      await newTransaction(type, amount, date, note, category);
+
+
+      router.push("/(tabs)/HomeScreen");
+  
+      // Reset dữ liệu sau khi thêm thành công
+      setTransactionData({
+        type: '',
+        amount: '',
+        date: '',
+        category: '',
+        note: '',
+      });
+      
+      return
+    } catch (error) {
+      console.error('Lỗi khi thêm giao dịch:', error);
+      Alert.alert('Lỗi khi thêm giao dịch', 'Vui lòng thử lại sau', [{ text: 'OK' }]);
     }
-    router.push('/(tabs)/HomeScreen');
   };
+  
 
   const handlePress = (type: 'income' | 'expense') => {
     setSelectedType(type);
