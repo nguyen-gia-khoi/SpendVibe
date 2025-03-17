@@ -3,28 +3,6 @@ import { getFirebaseErrorMessage } from "@/utils/firebaseErrorUtils";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import axios from "axios"; 
 
-// export const signUp = async (email: string, password: string, displayName: string) => {
-//   try {
-//     // Đăng ký tài khoản trên Firebase Auth
-//     const userCredential = await auth().createUserWithEmailAndPassword(email, password);
-
-//     // Cập nhật displayName cho user
-//     await userCredential.user.updateProfile({ displayName });
-
-//     // Gửi dữ liệu lên backend API
-//     await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/v1/customer/save-user`, {
-//       uid: userCredential.user.uid,
-//       email: userCredential.user.email,
-//       displayName: displayName,
-//     });
-
-//     return "Account created successfully!";
-//   } catch (error: any) {
-//     console.error("Error signing up:", error);
-//     throw new Error(error.message);
-//   }
-// };
-
 export const signUp = async (email: string, password: string, displayName: string) => {
   try {
     console.log("Bắt đầu đăng ký tài khoản...");
@@ -65,3 +43,12 @@ export const signUp = async (email: string, password: string, displayName: strin
     throw new Error(error.message);
   }
 };  
+export const fetchUserInfo = async (uid: string) => {
+  try {
+    const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/v1/customer/${uid}`);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API lấy user:", error);
+    return null;
+  }
+};
