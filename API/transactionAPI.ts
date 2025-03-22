@@ -29,3 +29,14 @@ export const newTransaction = async ( type : string,amount: string,date: string,
     
  }
 }
+export const getUserTransaction = async(uid: string) =>{
+  try {
+    const response = await axios.get(apiUrl, {
+      params: { uid },
+    });
+    return response.data.transactions;
+  } catch (error) {
+    console.error("Lỗi khi lấy giao dịch:", error);
+    return [];
+  }
+}

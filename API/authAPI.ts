@@ -52,3 +52,23 @@ export const fetchUserInfo = async (uid: string) => {
     return null;
   }
 };
+
+export const getUserTransactionSummary = async (
+  uid: string,
+  period: "day" | "month" | "year"
+): Promise<{ totalIncome: number; totalSpent: number }> => {
+  try {
+    const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/vi/customer/transaction/sum`, {
+      params: { uid, period },
+    });
+    console.log("Transaction summary fetched successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching transaction summary:", error);
+    // if (error.response) {
+    //   console.error("Response data:", error.response.data);
+    //   console.error("Response status:", error.response.status);
+    // }
+    throw error;
+  }
+};
