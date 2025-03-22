@@ -50,13 +50,6 @@ const Login = () => {
                 {loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white text-lg font-bold">Login</Text>}
             </TouchableOpacity>
 
-            {/* Google Login Button */}
-            <TouchableOpacity className="flex-row bg-white border border-gray-300 py-4 rounded-full items-center justify-center my-2" 
-                onPress={() => alert("Login with Google")}>
-                <AntDesign name="google" size={24} color="black" />
-                <Text className="text-gray-800 text-lg font-bold ml-2">Login with Google</Text>
-            </TouchableOpacity>
-
             {/* Link to Sign Up */}
             <View className="flex-row justify-center mt-5">
                 <Text className="text-lg text-gray-800">Don't have an account? </Text>
