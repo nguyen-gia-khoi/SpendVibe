@@ -31,6 +31,7 @@ export const newTransaction = async ( type : string,amount: string,date: string,
 }
 export const getUserTransaction = async(uid: string) =>{
   try {
+    console.log(apiUrl);
     const response = await axios.get(apiUrl, {
       params: { uid },
     });
