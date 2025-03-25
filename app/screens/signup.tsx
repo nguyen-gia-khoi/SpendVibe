@@ -1,8 +1,38 @@
+// SignUp.tsx
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { signUp } from "../../API/authAPI";
 import { getFirebaseErrorMessage } from "../../utils/firebaseErrorUtils";
+
+// Hàm handleSignUp được tách ra và export
+export const handleSignUp = async (
+  email: string,
+  password: string,
+  displayName: string,
+  setError: (error: string) => void,
+  setLoading: (loading: boolean) => void,
+  router: ReturnType<typeof useRouter>
+): Promise<void> => {
+  if (!email || !password || !displayName) {
+    setError("All fields are required.");
+    return;
+  }
+
+  setError("");
+  setLoading(true);
+
+  try {
+    await signUp(email, password, displayName);
+    alert("Account created successfully!");
+    router.push("/screens/login");
+  } catch (error: any) {
+    const friendlyMessage = getFirebaseErrorMessage(error.code);
+    setError(friendlyMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
 export default function SignUp() {
   const router = useRouter();
@@ -11,27 +41,6 @@ export default function SignUp() {
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const handleSignUp = async () => {
-    if (!email || !password || !displayName) {
-      setError("All fields are required.");
-      return;
-    }
-
-    setError("");
-    setLoading(true);
-
-    try {
-      await signUp(email, password, displayName);
-      alert("Account created successfully!");
-      router.push("/screens/login");
-    } catch (error: any) {
-      const friendlyMessage = getFirebaseErrorMessage(error.code);
-      setError(friendlyMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <View className="flex-1 bg-gray-100 p-5 justify-center">
@@ -68,7 +77,11 @@ export default function SignUp() {
         value={password}
       />
 
-      <TouchableOpacity className="bg-blue-500 py-4 rounded-full items-center mt-5" onPress={handleSignUp} disabled={loading}>
+      <TouchableOpacity
+        className="bg-blue-500 py-4 rounded-full items-center mt-5"
+        onPress={() => handleSignUp(email, password, displayName, setError, setLoading, router)}
+        disabled={loading}
+      >
         <Text className="text-white text-lg font-bold">{loading ? "Signing up..." : "Sign Up"}</Text>
       </TouchableOpacity>
 

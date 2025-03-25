@@ -1,9 +1,43 @@
+// Account.tsx
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import auth from "@react-native-firebase/auth";
 import Navbar from "./navbar";
 import { getUserTransactionSummary } from "../../API/authAPI";
+
+// Hàm fetchSummary được tách ra và export
+export const fetchSummary = async (
+  userId: string,
+  period: "day" | "month" | "year",
+  setSummary: (summary: { totalIncome: number; totalSpent: number }) => void
+): Promise<void> => {
+  try {
+    const data = await getUserTransactionSummary(userId, period);
+    setSummary(data);
+  } catch (error) {
+    console.error("Error fetching summary:", error);
+  }
+};
+
+// Hàm logout được tách ra và export
+export const logout = async (
+  signOut: () => Promise<void>,
+  router: { replace: (path: string) => void }
+): Promise<void> => {
+  try {
+    await signOut();
+    console.log("User logged out and data erased");
+    router.replace("/screens/login");
+  } catch (error) {
+    console.error("Logout Error:", error);
+  }
+};
+
+// Hàm formatNumberWithDots được tách ra và export
+export const formatNumberWithDots = (value: number): string => {
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
 
 export default function Account() {
   const [user, setUser] = useState<any>(null);
@@ -23,35 +57,11 @@ export default function Account() {
 
   // Lấy tổng chi tiêu và doanh thu qua API
   useEffect(() => {
-    const fetchSummary = async () => {
-      const user = auth().currentUser;
-      if (user) {
-        try {
-          const data = await getUserTransactionSummary(user.uid, period);
-          setSummary(data);
-        } catch (error) {
-          console.error("Error fetching summary:", error);
-        }
-      }
-    };
-
-    fetchSummary();
-  }, [period]);
-
-  const logout = async () => {
-    try {
-      await auth().signOut();
-      console.log("User logged out and data erased");
-      router.replace("/screens/login");
-    } catch (error) {
-      console.error("Logout Error:", error);
+    const user = auth().currentUser;
+    if (user) {
+      fetchSummary(user.uid, period, setSummary);
     }
-  };
-
-  // Hàm định dạng số với dấu chấm phân cách hàng nghìn
-  const formatNumberWithDots = (value: number): string => {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
+  }, [period]);
 
   if (loading) {
     return (
@@ -117,7 +127,7 @@ export default function Account() {
       {/* Nút logout */}
       <View className="mt-6 flex-1">
         <TouchableOpacity
-          onPress={logout}
+          onPress={() => logout(auth().signOut, router as any)}
           className="mt-4 bg-blue-600 py-3 rounded-2xl items-center mx-2"
         >
           <Text className="text-white font-semibold text-2xl">Logout</Text>
