@@ -58,10 +58,10 @@ export const getUserTransactionSummary = async (
   period: "day" | "month" | "year"
 ): Promise<{ totalIncome: number; totalSpent: number }> => {
   try {
-    const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/vi/customer/transaction/sum`, {
+    const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}/v1/customer/transaction/sum`, {
       params: { uid, period },
     });
-    console.log("Transaction summary fetched successfully:", response.data);
+    
     return response.data;
   } catch (error) {
     console.error("Error fetching transaction summary:", error);

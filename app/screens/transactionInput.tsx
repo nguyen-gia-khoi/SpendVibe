@@ -68,12 +68,20 @@ export const handleAmountChange = (
   setTransactionData: React.Dispatch<React.SetStateAction<TransactionInputData>>,
   transactionData: TransactionInputData
 ) => {
-  const rawValue = text.replace(/[^0-9]/g, ""); // Loại bỏ ký tự không phải số
+  let rawValue = text.replace(/[^0-9]/g, ""); // Loại bỏ ký tự không phải số
+  let numericValue = parseInt(rawValue, 10) || 0;
+
+  // Giới hạn số tiền không quá 1 tỷ
+  if (numericValue > 10_000_000_000) {
+    numericValue = 10_000_000_000;
+  }
+
   setTransactionData({
     ...transactionData,
-    amount: rawValue, // Lưu giá trị không định dạng
+    amount: numericValue.toString(),
   });
 };
+
 
 // Chuyển ảnh thành base64
 export const convertImageToBase64 = async (imageUri: string): Promise<string> => {
@@ -341,19 +349,21 @@ const TransactionInputScreen = () => {
 
         {showDatePicker && (
           <DateTimePicker
-            value={transactionData.date ? new Date(transactionData.date.split("/").reverse().join("-")) : new Date()}
+            value={new Date()}
             mode="date"
             display="default"
-            onChange={(event, selectedDate?: Date) => {
-              setShowDatePicker(false);
-              if (selectedDate) {
-                const formattedDate = formatDateToDDMMYYYY(selectedDate);
-                handleInputChange("date", formattedDate);
+            maximumDate={new Date()} // Chặn chọn ngày trong tương lai
+            onChange={(event, selectedDate) => {
+              if (selectedDate && selectedDate <= new Date()) {
+                setTransactionData(prev => ({
+                  ...prev,
+                  date: formatDateToDDMMYYYY(selectedDate),
+                }));
               }
+              setShowDatePicker(false); // Ẩn DatePicker sau khi chọn
             }}
           />
         )}
-
         <Button title="Thêm giao dịch" onPress={() => handleAddTransaction(transactionData, setTransactionData, router)} color="blue" />
         <View className="mt-4">
           <Button title="Scan bill" onPress={pickImage} color="blue" />
