@@ -30,18 +30,19 @@ const mockRouter = {
   reload: jest.fn(),
 };
 
-describe('handleSignIn - Alert Handling', () => {
+describe('testLogin', () => {
   const mockSignInWithEmailAndPassword = auth().signInWithEmailAndPassword as jest.Mock;
   const setLoading = jest.fn();
 
-  // Hàm testLogin 
-  const testLogin = async () => {
-    // Trường hợp 1: Đăng nhập thành công (không có alert)
+  beforeEach(() => {
     mockSignInWithEmailAndPassword.mockReset();
     mockRouter.replace.mockReset();
     setLoading.mockReset();
     mockAlert.mockReset();
+  });
 
+  // Trường hợp 1: Đăng nhập thành công (không có alert)
+  it('handles successful login', async () => {
     mockSignInWithEmailAndPassword.mockResolvedValueOnce({ user: { uid: '123' } });
     await handleSignIn('test@gmail.com', 'test123', mockRouter, setLoading);
 
@@ -50,13 +51,10 @@ describe('handleSignIn - Alert Handling', () => {
     expect(mockAlert).not.toHaveBeenCalled();
     expect(setLoading).toHaveBeenNthCalledWith(1, true);
     expect(setLoading).toHaveBeenNthCalledWith(2, false);
+  });
 
-    // Trường hợp 2: Lỗi invalid-email
-    mockSignInWithEmailAndPassword.mockReset();
-    mockRouter.replace.mockReset();
-    setLoading.mockReset();
-    mockAlert.mockReset();
-
+  // Trường hợp 2: Lỗi invalid-email
+  it('handles invalid-email error', async () => {
     const invalidEmailError = { code: 'auth/invalid-email', message: 'The email address is badly formatted.' };
     mockSignInWithEmailAndPassword.mockRejectedValueOnce(invalidEmailError);
     await handleSignIn('invalid-email', 'test123', mockRouter, setLoading);
@@ -66,13 +64,10 @@ describe('handleSignIn - Alert Handling', () => {
     expect(mockAlert).toHaveBeenCalledWith('Login failed: The email address is badly formatted.');
     expect(setLoading).toHaveBeenNthCalledWith(1, true);
     expect(setLoading).toHaveBeenNthCalledWith(2, false);
+  });
 
-    // Trường hợp 3: Lỗi invalid-credential
-    mockSignInWithEmailAndPassword.mockReset();
-    mockRouter.replace.mockReset();
-    setLoading.mockReset();
-    mockAlert.mockReset();
-
+  // Trường hợp 3: Lỗi invalid-credential
+  it('handles invalid-credential error', async () => {
     const invalidCredentialError = { code: 'auth/invalid-credential', message: 'The supplied auth credential is incorrect, malformed or has expired.' };
     mockSignInWithEmailAndPassword.mockRejectedValueOnce(invalidCredentialError);
     await handleSignIn('test@gmail.com', 'wrongpass', mockRouter, setLoading);
@@ -82,13 +77,10 @@ describe('handleSignIn - Alert Handling', () => {
     expect(mockAlert).toHaveBeenCalledWith('Login failed: The supplied auth credential is incorrect, malformed or has expired.');
     expect(setLoading).toHaveBeenNthCalledWith(1, true);
     expect(setLoading).toHaveBeenNthCalledWith(2, false);
+  });
 
-    // Trường hợp 4: Lỗi user-not-found
-    mockSignInWithEmailAndPassword.mockReset();
-    mockRouter.replace.mockReset();
-    setLoading.mockReset();
-    mockAlert.mockReset();
-
+  // Trường hợp 4: Lỗi user-not-found
+  it('handles user-not-found error', async () => {
     const userNotFoundError = { code: 'auth/invalid-credential', message: 'The supplied auth credential is incorrect, malformed or has expired.' };
     mockSignInWithEmailAndPassword.mockRejectedValueOnce(userNotFoundError);
     await handleSignIn('notfound@example.com', 'test123', mockRouter, setLoading);
@@ -98,13 +90,10 @@ describe('handleSignIn - Alert Handling', () => {
     expect(mockAlert).toHaveBeenCalledWith('Login failed: The supplied auth credential is incorrect, malformed or has expired.');
     expect(setLoading).toHaveBeenNthCalledWith(1, true);
     expect(setLoading).toHaveBeenNthCalledWith(2, false);
+  });
 
-    // Trường hợp 5: Lỗi mạng (network-request-failed)
-    mockSignInWithEmailAndPassword.mockReset();
-    mockRouter.replace.mockReset();
-    setLoading.mockReset();
-    mockAlert.mockReset();
-
+  // Trường hợp 5: Lỗi mạng (network-request-failed)
+  it('handles network-request-failed error', async () => {
     const networkError = { code: 'auth/network-request-failed', message: 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.' };
     mockSignInWithEmailAndPassword.mockRejectedValueOnce(networkError);
     await handleSignIn('test@gmail.com', 'test123', mockRouter, setLoading);
@@ -114,13 +103,10 @@ describe('handleSignIn - Alert Handling', () => {
     expect(mockAlert).toHaveBeenCalledWith('Login failed: A network error (such as timeout, interrupted connection or unreachable host) has occurred.');
     expect(setLoading).toHaveBeenNthCalledWith(1, true);
     expect(setLoading).toHaveBeenNthCalledWith(2, false);
+  });
 
-    // Trường hợp 6: Lỗi quá nhiều yêu cầu (too-many-requests)
-    mockSignInWithEmailAndPassword.mockReset();
-    mockRouter.replace.mockReset();
-    setLoading.mockReset();
-    mockAlert.mockReset();
-
+  // Trường hợp 6: Lỗi quá nhiều yêu cầu (too-many-requests)
+  it('handles too-many-requests error', async () => {
     const tooManyRequestsError = { code: 'auth/too-many-requests', message: 'Too many requests have been sent.' };
     mockSignInWithEmailAndPassword.mockRejectedValueOnce(tooManyRequestsError);
     await handleSignIn('test@gmail.com', 'password123', mockRouter, setLoading);
@@ -130,13 +116,10 @@ describe('handleSignIn - Alert Handling', () => {
     expect(mockAlert).toHaveBeenCalledWith('Login failed: Too many requests have been sent.');
     expect(setLoading).toHaveBeenNthCalledWith(1, true);
     expect(setLoading).toHaveBeenNthCalledWith(2, false);
+  });
 
-    // Trường hợp 7: Lỗi bỏ trống email
-    mockSignInWithEmailAndPassword.mockReset();
-    mockRouter.replace.mockReset();
-    setLoading.mockReset();
-    mockAlert.mockReset();
-
+  // Trường hợp 7: Lỗi bỏ trống email
+  it('handles empty email error', async () => {
     const emptyEmailError = { code: 'auth/empty-email', message: 'Cannot read property "code" of undefined' };
     mockSignInWithEmailAndPassword.mockRejectedValueOnce(emptyEmailError);
     await handleSignIn('', 'test123', mockRouter, setLoading);
@@ -146,13 +129,10 @@ describe('handleSignIn - Alert Handling', () => {
     expect(mockAlert).toHaveBeenCalledWith('Login failed: Cannot read property "code" of undefined');
     expect(setLoading).toHaveBeenNthCalledWith(1, true);
     expect(setLoading).toHaveBeenNthCalledWith(2, false);
+  });
 
-    // Trường hợp 8: Lỗi bỏ trống password
-    mockSignInWithEmailAndPassword.mockReset();
-    mockRouter.replace.mockReset();
-    setLoading.mockReset();
-    mockAlert.mockReset();
-
+  // Trường hợp 8: Lỗi bỏ trống password
+  it('handles empty password error', async () => {
     const emptyPasswordError = { code: 'auth/empty-password', message: 'Cannot read property "code" of undefined' };
     mockSignInWithEmailAndPassword.mockRejectedValueOnce(emptyPasswordError);
     await handleSignIn('test@gmail.com', '', mockRouter, setLoading);
@@ -162,13 +142,10 @@ describe('handleSignIn - Alert Handling', () => {
     expect(mockAlert).toHaveBeenCalledWith('Login failed: Cannot read property "code" of undefined');
     expect(setLoading).toHaveBeenNthCalledWith(1, true);
     expect(setLoading).toHaveBeenNthCalledWith(2, false);
+  });
 
-    // Trường hợp 9: Lỗi bỏ trống cả email và password
-    mockSignInWithEmailAndPassword.mockReset();
-    mockRouter.replace.mockReset();
-    setLoading.mockReset();
-    mockAlert.mockReset();
-
+  // Trường hợp 9: Lỗi bỏ trống cả email và password
+  it('handles empty email and password error', async () => {
     const emptyEmailAndPasswordError = { code: 'auth/empty-email-and-password', message: 'Cannot read property "code" of undefined' };
     mockSignInWithEmailAndPassword.mockRejectedValueOnce(emptyEmailAndPasswordError);
     await handleSignIn('', '', mockRouter, setLoading);
@@ -178,8 +155,5 @@ describe('handleSignIn - Alert Handling', () => {
     expect(mockAlert).toHaveBeenCalledWith('Login failed: Cannot read property "code" of undefined');
     expect(setLoading).toHaveBeenNthCalledWith(1, true);
     expect(setLoading).toHaveBeenNthCalledWith(2, false);
-  };
-
-  // Gọi hàm testLogin trong it
-  it('should handle all login scenarios', testLogin);
+  });
 });

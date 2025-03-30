@@ -1,6 +1,6 @@
 // __tests__/TransactionInputScreen.test.tsx
 
-import { handleAddTransaction } from '../../app/screens/transactionInput';
+import { handleAddTransaction, handleAmountChange, formatDateToDDMMYYYY } from '../../app/screens/transactionInput';
 import { newTransaction } from '@/API/transactionAPI';
 
 // Mock Firebase auth
@@ -16,13 +16,13 @@ jest.mock('@/API/transactionAPI', () => ({
   newTransaction: jest.fn(),
 }));
 
-describe('handleAddTransaction - Add Expense', () => {
+describe('testHandleAddTransaction', () => {
   const setTransactionData = jest.fn();
   const mockRouter = {
     push: jest.fn(),
   };
   const transactionData = {
-    type: 'expense', // Tập trung vào chi tiêu
+    type: 'expense',
     amount: '100000',
     date: '15/10/2023',
     category: 'Chi phí sinh hoạt',
@@ -37,10 +37,8 @@ describe('handleAddTransaction - Add Expense', () => {
     mockRouter.push.mockReset();
     mockConsoleError.mockClear();
   });
-
-  // Hàm testHandleAddTransaction duy nhất, kiểm tra tất cả 8 trường hợp
-  const testHandleAddTransaction = async () => {
-    // Trường hợp 1: Thêm chi tiêu thành công
+//th1
+  it('should successfully add a transaction with all fields', async () => {
     (newTransaction as jest.Mock).mockResolvedValueOnce({ success: true });
     await handleAddTransaction(transactionData, setTransactionData, mockRouter);
 
@@ -59,15 +57,9 @@ describe('handleAddTransaction - Add Expense', () => {
       category: '',
       note: '',
     });
-
-    // Reset các mock trước khi kiểm tra trường hợp 2
-    jest.clearAllMocks();
-    (newTransaction as jest.Mock).mockReset();
-    setTransactionData.mockReset();
-    mockRouter.push.mockReset();
-    mockConsoleError.mockClear();
-
-    // Trường hợp 2: Thêm chi tiêu thành công khi note rỗng
+  });
+//th2
+  it('should successfully add a transaction with empty note', async () => {
     const dataWithEmptyNote = { ...transactionData, note: '' };
     (newTransaction as jest.Mock).mockResolvedValueOnce({ success: true });
     await handleAddTransaction(dataWithEmptyNote, setTransactionData, mockRouter);
@@ -87,101 +79,48 @@ describe('handleAddTransaction - Add Expense', () => {
       category: '',
       note: '',
     });
-
-    // Reset các mock trước khi kiểm tra trường hợp 3
-    jest.clearAllMocks();
-    (newTransaction as jest.Mock).mockReset();
-    setTransactionData.mockReset();
-    mockRouter.push.mockReset();
-    mockConsoleError.mockClear();
-
-    // Trường hợp 3: Thiếu trường amount
-    const incompleteData1 = { ...transactionData, amount: '' };
-    await handleAddTransaction(incompleteData1, setTransactionData, mockRouter);
+  });
+//th3
+  it('should not add transaction when amount is missing', async () => {
+    const incompleteData = { ...transactionData, amount: '' };
+    await handleAddTransaction(incompleteData, setTransactionData, mockRouter);
 
     expect(newTransaction).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setTransactionData).not.toHaveBeenCalled();
-
-    // Reset các mock trước khi kiểm tra trường hợp 4
-    jest.clearAllMocks();
-    (newTransaction as jest.Mock).mockReset();
-    setTransactionData.mockReset();
-    mockRouter.push.mockReset();
-    mockConsoleError.mockClear();
-
-    // Trường hợp 4: Thiếu trường date
-    const incompleteData2 = { ...transactionData, date: '' };
-    await handleAddTransaction(incompleteData2, setTransactionData, mockRouter);
+  });
+//th4
+  it('should not add transaction when date is missing', async () => {
+    const incompleteData = { ...transactionData, date: '' };
+    await handleAddTransaction(incompleteData, setTransactionData, mockRouter);
 
     expect(newTransaction).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setTransactionData).not.toHaveBeenCalled();
-
-    // Reset các mock trước khi kiểm tra trường hợp 5
-    jest.clearAllMocks();
-    (newTransaction as jest.Mock).mockReset();
-    setTransactionData.mockReset();
-    mockRouter.push.mockReset();
-    mockConsoleError.mockClear();
-
-    // Trường hợp 5: Thiếu trường category
-    const incompleteData3 = { ...transactionData, category: '' };
-    await handleAddTransaction(incompleteData3, setTransactionData, mockRouter);
+  });
+//th5
+  it('should not add transaction when category is missing', async () => {
+    const incompleteData = { ...transactionData, category: '' };
+    await handleAddTransaction(incompleteData, setTransactionData, mockRouter);
 
     expect(newTransaction).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setTransactionData).not.toHaveBeenCalled();
-
-    // Reset các mock trước khi kiểm tra trường hợp 6
-    jest.clearAllMocks();
-    (newTransaction as jest.Mock).mockReset();
-    setTransactionData.mockReset();
-    mockRouter.push.mockReset();
-    mockConsoleError.mockClear();
-
-    // Trường hợp 6: Thiếu nhiều trường bắt buộc
-    const incompleteData4 = { ...transactionData, amount: '', date: '', category: '' };
-    await handleAddTransaction(incompleteData4, setTransactionData, mockRouter);
+  });
+//th6
+  it('should not add transaction when multiple required fields are missing', async () => {
+    const incompleteData = { ...transactionData, amount: '', date: '', category: '' };
+    await handleAddTransaction(incompleteData, setTransactionData, mockRouter);
 
     expect(newTransaction).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setTransactionData).not.toHaveBeenCalled();
-
-    // Reset các mock trước khi kiểm tra trường hợp 7
-    jest.clearAllMocks();
-    (newTransaction as jest.Mock).mockReset();
-    setTransactionData.mockReset();
-    mockRouter.push.mockReset();
-    mockConsoleError.mockClear();
-
-    // Trường hợp 7: Hàm newTransaction thất bại
-    const error1 = new Error('API error');
-    (newTransaction as jest.Mock).mockRejectedValueOnce(error1);
-    await handleAddTransaction(transactionData, setTransactionData, mockRouter);
-
-    expect(newTransaction).toHaveBeenCalledWith(
-      transactionData.type,
-      transactionData.amount,
-      transactionData.date,
-      transactionData.note,
-      transactionData.category
-    );
-    expect(mockRouter.push).not.toHaveBeenCalled();
-    expect(setTransactionData).not.toHaveBeenCalled();
-    expect(mockConsoleError).toHaveBeenCalledWith('Lỗi khi thêm giao dịch:', error1);
-
-    // Reset các mock trước khi kiểm tra trường hợp 8
-    jest.clearAllMocks();
-    (newTransaction as jest.Mock).mockReset();
-    setTransactionData.mockReset();
-    mockRouter.push.mockReset();
-    mockConsoleError.mockClear();
-
-    // Trường hợp 8: Nhập amount toàn số 0
-    const zeroAmountData = { ...transactionData, amount: '0000' };
-    const error2 = new Error('Amount cannot be zero');
-    (newTransaction as jest.Mock).mockRejectedValueOnce(error2);
+  });
+//th7
+  it('should handle error when amount is zero', async () => {
+    const zeroAmountData = { ...transactionData, amount: '00' };
+    const error = new Error('Amount cannot be zero');
+    (newTransaction as jest.Mock).mockRejectedValueOnce(error);
     await handleAddTransaction(zeroAmountData, setTransactionData, mockRouter);
 
     expect(newTransaction).toHaveBeenCalledWith(
@@ -193,9 +132,132 @@ describe('handleAddTransaction - Add Expense', () => {
     );
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setTransactionData).not.toHaveBeenCalled();
-    expect(mockConsoleError).toHaveBeenCalledWith('Lỗi khi thêm giao dịch:', error2);
+    expect(mockConsoleError).toHaveBeenCalledWith('Lỗi khi thêm giao dịch:', error);
+  });
+//th8
+  it('should handle API error when adding transaction', async () => {
+    const error = new Error('API Error');
+    (newTransaction as jest.Mock).mockRejectedValueOnce(error);
+    await handleAddTransaction(transactionData, setTransactionData, mockRouter);
+
+    expect(newTransaction).toHaveBeenCalledWith(
+      transactionData.type,
+      transactionData.amount,
+      transactionData.date,
+      transactionData.note,
+      transactionData.category
+    );
+    expect(mockRouter.push).not.toHaveBeenCalled();
+    expect(setTransactionData).not.toHaveBeenCalled();
+    expect(mockConsoleError).toHaveBeenCalledWith('Lỗi khi thêm giao dịch:', error);
+  });
+});
+
+describe('testHandleAmountChange', () => {
+  const setTransactionData = jest.fn();
+  const transactionData = {
+    type: 'expense',
+    amount: '',
+    date: '15/10/2023',
+    category: 'Chi phí sinh hoạt',
+    note: 'Ghi chú',
   };
 
-  // Gọi hàm testHandleAddTransaction trong it
-  it('should handle all add transaction scenarios', testHandleAddTransaction);
+  beforeEach(() => {
+    setTransactionData.mockReset();
+  });
+
+  it('should handle negative amount input', () => {
+    handleAmountChange('-100000', setTransactionData, transactionData);
+    expect(setTransactionData).toHaveBeenCalledWith({
+      ...transactionData,
+      amount: '100000',
+    });
+  });
+
+  it('should handle amount exceeding 1 billion', () => {
+    handleAmountChange('20000000000', setTransactionData, transactionData);
+    expect(setTransactionData).toHaveBeenCalledWith({
+      ...transactionData,
+      amount: '10000000000',
+    });
+  });
+
+  it('should handle non-numeric input', () => {
+    handleAmountChange('abc', setTransactionData, transactionData);
+    expect(setTransactionData).toHaveBeenCalledWith({
+      ...transactionData,
+      amount: '0',
+    });
+  });
+
+  it('should handle mixed numeric and non-numeric input', () => {
+    handleAmountChange('100abc000', setTransactionData, transactionData);
+    expect(setTransactionData).toHaveBeenCalledWith({
+      ...transactionData,
+      amount: '100000',
+    });
+  });
+});
+
+describe('testDateValidation', () => {
+  const setTransactionData = jest.fn();
+  const transactionData = {
+    type: 'expense',
+    amount: '100000',
+    date: '',
+    category: 'Chi phí sinh hoạt',
+    note: 'Ghi chú',
+  };
+
+  beforeEach(() => {
+    setTransactionData.mockReset();
+  });
+
+  it('should not allow future dates', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 1);
+    const futureDateString = formatDateToDDMMYYYY(futureDate);
+    
+    setTransactionData({
+      ...transactionData,
+      date: futureDateString,
+    });
+
+    expect(setTransactionData).toHaveBeenCalledWith({
+      ...transactionData,
+      date: futureDateString,
+    });
+  });
+
+  it('should allow current date', () => {
+    const currentDate = new Date();
+    const currentDateString = formatDateToDDMMYYYY(currentDate);
+    
+    setTransactionData({
+      ...transactionData,
+      date: currentDateString,
+    });
+
+    expect(setTransactionData).toHaveBeenCalledWith({
+      ...transactionData,
+      date: currentDateString,
+    });
+  });
+
+  it('should allow past dates', () => {
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 1);
+    const pastDateString = formatDateToDDMMYYYY(pastDate);
+    
+    setTransactionData({
+      ...transactionData,
+      date: pastDateString,
+    });
+
+    expect(setTransactionData).toHaveBeenCalledWith({
+      ...transactionData,
+      date: pastDateString,
+    });
+  });
 });

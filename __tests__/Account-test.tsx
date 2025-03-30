@@ -8,7 +8,9 @@ jest.mock('@react-native-firebase/auth', () => {
   return () => ({
     signOut: jest.fn(),
     currentUser: {
-      uid: 'test-user-id'
+      uid: 'test-user-id',
+      displayName: 'Test User',
+      email: 'test@example.com'
     }
   });
 });
@@ -48,20 +50,80 @@ const mockRouter: Router = {
   canDismiss: jest.fn().mockReturnValue(false) as jest.Mock,
 };
 
-describe('logout', () => {
-  const signOut = jest.fn();
-
+describe('Account Component Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    signOut.mockReset();
-    mockRouter.replace.mockReset();
-    mockRouter.replace.mockClear();
-    mockConsoleLog.mockClear();
     mockConsoleError.mockClear();
+    mockConsoleLog.mockClear();
   });
+
+  // Hàm testUserInfo
+  const testUserInfo = () => {
+    const auth = require('@react-native-firebase/auth')();
+    expect(auth.currentUser.displayName).toBe('Test User');
+    expect(auth.currentUser.email).toBe('test@example.com');
+    expect(auth.currentUser.uid).toBe('test-user-id');
+  };
+
+  // Hàm testTransactionSummary
+  const testTransactionSummary = async () => {
+    const mockSetSummary = jest.fn();
+    const mockSummaryData = {
+      totalIncome: 1000000,
+      totalSpent: 500000
+    };
+
+    // Test daily summary
+    (getUserTransactionSummary as jest.Mock).mockResolvedValueOnce(mockSummaryData);
+    await fetchSummary('test-user-id', 'day', mockSetSummary);
+    expect(getUserTransactionSummary).toHaveBeenCalledWith('test-user-id', 'day');
+    expect(mockSetSummary).toHaveBeenCalledWith(mockSummaryData);
+
+    // Reset mocks
+    jest.clearAllMocks();
+    mockSetSummary.mockClear();
+
+    // Test monthly summary
+    (getUserTransactionSummary as jest.Mock).mockResolvedValueOnce(mockSummaryData);
+    await fetchSummary('test-user-id', 'month', mockSetSummary);
+    expect(getUserTransactionSummary).toHaveBeenCalledWith('test-user-id', 'month');
+    expect(mockSetSummary).toHaveBeenCalledWith(mockSummaryData);
+
+    // Reset mocks
+    jest.clearAllMocks();
+    mockSetSummary.mockClear();
+
+    // Test yearly summary
+    (getUserTransactionSummary as jest.Mock).mockResolvedValueOnce(mockSummaryData);
+    await fetchSummary('test-user-id', 'year', mockSetSummary);
+    expect(getUserTransactionSummary).toHaveBeenCalledWith('test-user-id', 'year');
+    expect(mockSetSummary).toHaveBeenCalledWith(mockSummaryData);
+
+    // Reset mocks
+    jest.clearAllMocks();
+    mockSetSummary.mockClear();
+
+    // Test error case
+    const error = new Error('Failed to fetch summary');
+    (getUserTransactionSummary as jest.Mock).mockRejectedValueOnce(error);
+    await fetchSummary('test-user-id', 'day', mockSetSummary);
+    expect(getUserTransactionSummary).toHaveBeenCalledWith('test-user-id', 'day');
+    expect(mockSetSummary).not.toHaveBeenCalled();
+    expect(mockConsoleError).toHaveBeenCalledWith('Error fetching summary:', error);
+  };
+
+  // Hàm testNumberFormatting
+  const testNumberFormatting = () => {
+    expect(formatNumberWithDots(1000000)).toBe('1.000.000');
+    expect(formatNumberWithDots(500000)).toBe('500.000');
+    expect(formatNumberWithDots(1000)).toBe('1.000');
+    expect(formatNumberWithDots(100)).toBe('100');
+  };
 
   // Hàm testLogout 
   const testLogout = async () => {
+    const signOut = jest.fn();
+
     // Trường hợp 1: Đăng xuất thành công
     signOut.mockResolvedValueOnce(undefined);
     await logout(signOut, mockRouter);
@@ -90,6 +152,9 @@ describe('logout', () => {
     expect(mockConsoleError).toHaveBeenCalledWith('Logout Error:', error);
   };
 
-  // Gọi hàm testLogout trong it
+  // Gọi các hàm test trong các it block
+  it('should display correct user information', testUserInfo);
+  it('should handle all transaction summary scenarios', testTransactionSummary);
+  it('should format numbers with dots correctly', testNumberFormatting);
   it('should handle all logout scenarios', testLogout);
 });
