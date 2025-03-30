@@ -68,18 +68,18 @@ export const handleAmountChange = (
   setTransactionData: React.Dispatch<React.SetStateAction<TransactionInputData>>,
   transactionData: TransactionInputData
 ) => {
-  let rawValue = text.replace(/[^0-9]/g, ""); // Loại bỏ ký tự không phải số
-  let numericValue = parseInt(rawValue, 10) || 0;
+ let rawValue = text.replace(/[^0-9]/g, ""); // Loại bỏ ký tự không phải số
+ let numericValue = parseInt(rawValue,10) || 0;
 
-  // Giới hạn số tiền không quá 1 tỷ
-  if (numericValue > 10_000_000_000) {
-    numericValue = 10_000_000_000;
-  }
-
-  setTransactionData({
-    ...transactionData,
-    amount: numericValue.toString(),
-  });
+ //Gioi han so tien khong qua 1 ty
+ if (numericValue > 10_000_000_000) {
+ numericValue = 10_000_000_000;
+ }
+setTransactionData({
+  ...transactionData,
+  amount: numericValue.toString(),
+});
+ //Kiem tra so tien co bang 0 khong
 };
 
 

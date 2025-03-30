@@ -12,17 +12,17 @@ jest.mock('@/API/authAPI', () => ({
 // Mock alert
 global.alert = jest.fn();
 
-describe('handleSignUp function', () => {
+describe('testSignUp', () => {
   let mockRouter: Partial<Router>;
   let mockSignUp: jest.Mock;
 
-  // Hàm testSignUp 
-  const testSignUp = async () => {
+  beforeEach(() => {
     mockRouter = { push: jest.fn() };
     mockSignUp = signUp as jest.Mock;
-
-    // TC01: DisplayName hợp lệ → Hợp lệ
     jest.clearAllMocks();
+  });
+
+  it('TC01: DisplayName hợp lệ → Hợp lệ', async () => {
     mockSignUp.mockResolvedValueOnce({});
     let setError = jest.fn();
     let setLoading = jest.fn();
@@ -33,11 +33,11 @@ describe('handleSignUp function', () => {
     expect(mockRouter.push).toHaveBeenCalledWith('/screens/login');
     expect(setError).toHaveBeenCalledWith('');
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC02: DisplayName trống → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC02: DisplayName trống → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', 'password123', '', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -45,12 +45,12 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC03: Email hợp lệ → Hợp lệ
-    jest.clearAllMocks();
+  it('TC03: Email hợp lệ → Hợp lệ', async () => {
     mockSignUp.mockResolvedValueOnce({});
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', 'password123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('test1@email.com', 'password123', 'Test User');
@@ -58,12 +58,12 @@ describe('handleSignUp function', () => {
     expect(mockRouter.push).toHaveBeenCalledWith('/screens/login');
     expect(setError).toHaveBeenCalledWith('');
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC04: Email sai format → Báo lỗi "The email address is not valid. Please enter a valid email."
-    jest.clearAllMocks();
+  it('TC04: Email sai format → Báo lỗi "The email address is not valid. Please enter a valid email."', async () => {
     mockSignUp.mockRejectedValueOnce({ code: 'auth/invalid-email' });
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('password123', 'password123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('password123', 'password123', 'Test User');
@@ -72,12 +72,12 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC05: Email đã tồn tại → Báo lỗi "This email is already in use. Please use a different email."
-    jest.clearAllMocks();
+  it('TC05: Email đã tồn tại → Báo lỗi "This email is already in use. Please use a different email."', async () => {
     mockSignUp.mockRejectedValueOnce({ code: 'auth/email-already-in-use' });
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test@gmail.com', 'password123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('test@gmail.com', 'password123', 'Test User');
@@ -86,11 +86,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC06: Email trống → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC06: Email trống → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('', 'password123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -98,12 +98,12 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC07: Password hợp lệ → Hợp lệ
-    jest.clearAllMocks();
+  it('TC07: Password hợp lệ → Hợp lệ', async () => {
     mockSignUp.mockResolvedValueOnce({});
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', 'password123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('test1@email.com', 'password123', 'Test User');
@@ -111,12 +111,12 @@ describe('handleSignUp function', () => {
     expect(mockRouter.push).toHaveBeenCalledWith('/screens/login');
     expect(setError).toHaveBeenCalledWith('');
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC08: Password quá yếu → Báo lỗi "The password is too weak. Please choose a stronger password."
-    jest.clearAllMocks();
+  it('TC08: Password quá yếu → Báo lỗi "The password is too weak. Please choose a stronger password."', async () => {
     mockSignUp.mockRejectedValueOnce({ code: 'auth/weak-password' });
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', '123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('test1@email.com', '123', 'Test User');
@@ -125,11 +125,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC09: Password trống → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC09: Password trống → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', '', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -137,12 +137,12 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC10: DisplayName hợp lệ, Email hợp lệ, Password hợp lệ → Hợp lệ
-    jest.clearAllMocks();
+  it('TC10: DisplayName hợp lệ, Email hợp lệ, Password hợp lệ → Hợp lệ', async () => {
     mockSignUp.mockResolvedValueOnce({});
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', 'password123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('test1@email.com', 'password123', 'Test User');
@@ -150,11 +150,11 @@ describe('handleSignUp function', () => {
     expect(mockRouter.push).toHaveBeenCalledWith('/screens/login');
     expect(setError).toHaveBeenCalledWith('');
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC11: DisplayName trống, Email hợp lệ, Password hợp lệ → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC11: DisplayName trống, Email hợp lệ, Password hợp lệ → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', 'password123', '', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -162,11 +162,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC12: DisplayName hợp lệ, Email trống, Password hợp lệ → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC12: DisplayName hợp lệ, Email trống, Password hợp lệ → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('', 'password123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -174,11 +174,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC13: DisplayName hợp lệ, Email hợp lệ, Password trống → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC13: DisplayName hợp lệ, Email hợp lệ, Password trống → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', '', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -186,11 +186,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC14: DisplayName trống, Email trống, Password hợp lệ → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC14: DisplayName trống, Email trống, Password hợp lệ → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('', 'password123', '', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -198,11 +198,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC15: DisplayName trống, Email hợp lệ, Password trống → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC15: DisplayName trống, Email hợp lệ, Password trống → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', '', '', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -210,11 +210,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC16: DisplayName hợp lệ, Email trống, Password trống → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC16: DisplayName hợp lệ, Email trống, Password trống → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('', '', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -222,11 +222,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC17: DisplayName trống, Email trống, Password trống → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC17: DisplayName trống, Email trống, Password trống → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('', '', '', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -234,12 +234,12 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC18: DisplayName hợp lệ, Email sai format, Password hợp lệ → Báo lỗi "The email address is not valid. Please enter a valid email."
-    jest.clearAllMocks();
+  it('TC18: DisplayName hợp lệ, Email sai format, Password hợp lệ → Báo lỗi "The email address is not valid. Please enter a valid email."', async () => {
     mockSignUp.mockRejectedValueOnce({ code: 'auth/invalid-email' });
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('password123', 'password123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('password123', 'password123', 'Test User');
@@ -248,12 +248,12 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC19: DisplayName hợp lệ, Email đã tồn tại, Password hợp lệ → Báo lỗi "This email is already in use. Please use a different email."
-    jest.clearAllMocks();
+  it('TC19: DisplayName hợp lệ, Email đã tồn tại, Password hợp lệ → Báo lỗi "This email is already in use. Please use a different email."', async () => {
     mockSignUp.mockRejectedValueOnce({ code: 'auth/email-already-in-use' });
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test@gmail.com', 'password123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('test@gmail.com', 'password123', 'Test User');
@@ -262,12 +262,12 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC20: DisplayName hợp lệ, Email hợp lệ, Password quá yếu → Báo lỗi "The password is too weak. Please choose a stronger password."
-    jest.clearAllMocks();
+  it('TC20: DisplayName hợp lệ, Email hợp lệ, Password quá yếu → Báo lỗi "The password is too weak. Please choose a stronger password."', async () => {
     mockSignUp.mockRejectedValueOnce({ code: 'auth/weak-password' });
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test1@email.com', '123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('test1@email.com', '123', 'Test User');
@@ -276,12 +276,12 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC21: DisplayName trống, Email đã tồn tại, Password hợp lệ → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
+  it('TC21: DisplayName trống, Email đã tồn tại, Password hợp lệ → Báo lỗi "All fields are required."', async () => {
     mockSignUp.mockRejectedValueOnce({ code: 'auth/email-already-in-use' });
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test@gmail.com', 'password123', '', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -289,12 +289,12 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC22: DisplayName hợp lệ, Email đã tồn tại, Password quá yếu → Báo lỗi "This email is already in use. Please use a different email."
-    jest.clearAllMocks();
+  it('TC22: DisplayName hợp lệ, Email đã tồn tại, Password quá yếu → Báo lỗi "This email is already in use. Please use a different email."', async () => {
     mockSignUp.mockRejectedValueOnce({ code: 'auth/email-already-in-use' });
-    setError = jest.fn();
-    setLoading = jest.fn();
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test@gmail.com', '123', 'Test User', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).toHaveBeenCalledWith('test@gmail.com', '123', 'Test User');
@@ -303,11 +303,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading.mock.calls).toEqual([[true], [false]]);
+  });
 
-    // TC23: DisplayName trống, Email sai format, Password trống → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC23: DisplayName trống, Email sai format, Password trống → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('password123', '', '', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -315,11 +315,11 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
+  });
 
-    // TC24: DisplayName trống, Email đã tồn tại, Password quá yếu → Báo lỗi "All fields are required."
-    jest.clearAllMocks();
-    setError = jest.fn();
-    setLoading = jest.fn();
+  it('TC24: DisplayName trống, Email đã tồn tại, Password quá yếu → Báo lỗi "All fields are required."', async () => {
+    let setError = jest.fn();
+    let setLoading = jest.fn();
     await handleSignUp('test@gmail.com', '123', '', setError, setLoading, mockRouter as Router);
 
     expect(mockSignUp).not.toHaveBeenCalled();
@@ -327,8 +327,5 @@ describe('handleSignUp function', () => {
     expect(global.alert).not.toHaveBeenCalled();
     expect(mockRouter.push).not.toHaveBeenCalled();
     expect(setLoading).not.toHaveBeenCalled();
-  };
-
-  // Gọi hàm testSignUp trong it
-  it('should handle all signup scenarios', testSignUp);
+  });
 });
